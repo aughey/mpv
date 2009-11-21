@@ -135,30 +135,30 @@ ENDIF()
 
 # When compiling with Visual Studio search for a precompiled version
 # of the SDL in the 3rdPartyMPV folder.
-IF(WIN32 AND MSVC)
-    SET(SDL_ROOT ${PROJECT_SOURCE_DIR}/../3rdPartyMPV/SDL-1.2.13
-        CACHE PATH "A location to look for the SDL")
-ELSE()
-    SET(SDL_ROOT ""
-        CACHE PATH "A location to look for the SDL")
-ENDIF()
+#IF(WIN32 AND MSVC)
+#    SET(SDL_ROOT ${PROJECT_SOURCE_DIR}/../3rdPartyMPV/SDL-1.2.13
+#        CACHE PATH "A location to look for the SDL")
+#ELSE()
+#    SET(SDL_ROOT ""
+#        CACHE PATH "A location to look for the SDL")
+#ENDIF()
 
-IF(SDL_ROOT)
-    IF(CMAKE_MAJOR_VERSION GREATER 1 AND
-            CMAKE_MINOR_VERSION GREATER 4)
-        SET(CMAKE_PREFIX_PATH ${SDL_ROOT})
-    ELSE()
-        # These stopped working in CMake 2.6.0, probably a bug
-        SET(CMAKE_INCLUDE_PATH ${SDL_ROOT}/include)
-        SET(CMAKE_LIBRARY_PATH ${SDL_ROOT}/lib)
-    ENDIF()
-ENDIF()
+#IF(SDL_ROOT)
+#    IF(CMAKE_MAJOR_VERSION GREATER 1 AND
+#            CMAKE_MINOR_VERSION GREATER 4)
+#        SET(CMAKE_PREFIX_PATH ${SDL_ROOT})
+#    ELSE()
+#        # These stopped working in CMake 2.6.0, probably a bug
+#        SET(CMAKE_INCLUDE_PATH ${SDL_ROOT}/include)
+#        SET(CMAKE_LIBRARY_PATH ${SDL_ROOT}/lib)
+#    ENDIF()
+#ENDIF()
 
-FIND_PACKAGE(SDL)
+#FIND_PACKAGE(SDL)
 
-IF(NOT SDL_FOUND)
-    MESSAGE("The SDL was not found, but is required")
-ENDIF(NOT SDL_FOUND)
+#IF(NOT SDL_FOUND)
+#    MESSAGE("The SDL was not found, but is required")
+#ENDIF(NOT SDL_FOUND)
 
 #----------------------------
 # OSG
@@ -261,7 +261,7 @@ ADD_SUBDIRECTORY(commonS11n)
 ADD_SUBDIRECTORY(hps)
 
 ADD_SUBDIRECTORY(kernel)
-ADD_SUBDIRECTORY(osgSDL)
+//ADD_SUBDIRECTORY(osgSDL)
 
 ADD_SUBDIRECTORY(pluginCameraMgrOSG)
 ADD_SUBDIRECTORY(pluginCoordinateConversionGCC)
@@ -278,12 +278,12 @@ ADD_SUBDIRECTORY(pluginExecLengthTiming)
 #ADD_SUBDIRECTORY(pluginGlobalWeatherMgr)
 ADD_SUBDIRECTORY(pluginMissionFuncsMgr)
 ADD_SUBDIRECTORY(pluginMissionFuncsOSG)
-ADD_SUBDIRECTORY(pluginMotionTrackerJoystickSDL)
+#ADD_SUBDIRECTORY(pluginMotionTrackerJoystickSDL)
 ADD_SUBDIRECTORY(pluginMotionTrackerMgr)
 ADD_SUBDIRECTORY(pluginMotionTrackerRecvr)
 ADD_SUBDIRECTORY(pluginRenderAmbientLightOSG)
 #ADD_SUBDIRECTORY(pluginRenderAtmosphericOSG)
-ADD_SUBDIRECTORY(pluginRenderCameraCigiSDLOSG)
+#ADD_SUBDIRECTORY(pluginRenderCameraCigiSDLOSG)
 ADD_SUBDIRECTORY(pluginRenderDynamicLightOSG)
 ADD_SUBDIRECTORY(pluginRenderEntsAutoArticulationOSG)
 ADD_SUBDIRECTORY(pluginRenderEntsHighVisibilityOSG)
