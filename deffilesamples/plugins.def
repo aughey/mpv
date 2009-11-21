@@ -70,7 +70,7 @@ plugins
 	filename = "PluginCameraMgrOSG";
 
 	// renders the scene
-	filename = "PluginRenderCameraCigiSDLOSG";
+	//filename = "PluginRenderCameraCigiSDLOSG";
 
 	// takes screen shots and captures movies (very convenient)
 //	filename = "PluginVideoCapture";

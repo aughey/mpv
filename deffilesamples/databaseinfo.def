@@ -43,7 +43,7 @@ databases
 	{
 		name = "St. Louis";
 		id = 1;
-		directory = "/opt/data/terrain/StLouis_5m_512/";
+		directory = "/home/jha/mpv-data/terrain/StLouis_5m_512/";
 		filename = "archive.txp";
 		coordinate_system = TM;
 		// latitude of origin is 38.624670999999999
