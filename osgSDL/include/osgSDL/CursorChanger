@@ -1,0 +1,44 @@
+#ifndef OSGSDL_CURSORCHANGER_
+#define OSGSDL_CURSORCHANGER_ 1
+
+#include <SDL.h>
+
+#include <osgSDL/Cursor>
+
+namespace osgSDL
+{
+
+	class CursorChanger {
+	public:
+		inline CursorChanger(SDL_Cursor *c);
+		inline CursorChanger(Cursor *c);
+		inline ~CursorChanger();
+		
+	private:
+		SDL_Cursor *prev_csr_;
+		osg::ref_ptr<Cursor> csr_;
+	};
+	
+	// INLINE METHODS
+	
+	inline CursorChanger::CursorChanger(SDL_Cursor *c)
+	{
+		prev_csr_ = SDL_GetCursor();
+		SDL_SetCursor(c);
+	}
+
+	inline CursorChanger::CursorChanger(Cursor *c)
+	{
+		csr_ = c;
+		prev_csr_ = SDL_GetCursor();
+		SDL_SetCursor(c->getSDLCursor());		
+	}
+	
+	inline CursorChanger::~CursorChanger()
+	{
+		SDL_SetCursor(prev_csr_);
+	}
+
+}
+
+#endif

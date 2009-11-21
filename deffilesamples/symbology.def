@@ -1,0 +1,18 @@
+fonts
+{
+   font
+   {
+      id = 17;
+      fname = "arial.ttf";
+   }
+   font
+   {
+      id = 18;
+      fname = "times.ttf";
+   }
+   font
+   {
+      id = 19;
+      fname = "fudd.ttf";
+   }
+}

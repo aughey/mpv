@@ -1,0 +1,337 @@
+#ifndef OSGSDL_VIEWER_
+#define OSGSDL_VIEWER_ 1
+
+#include <vector>
+#include <string>
+
+#include <osgSDL/Export>
+#include <osgSDL/TimeSource>
+#include <osgSDL/Viewport>
+#include <osgSDL/SDLEventAdapter>
+#include <osgSDL/Cursor>
+
+#include <osg/ref_ptr>
+#include <osg/FrameStamp>
+#include <osg/DisplaySettings>
+#include <osg/State>
+
+#include <osgGA/GUIActionAdapter>
+#include <osgGA/GUIEventHandler>
+#include <osgGA/MatrixManipulator>
+
+#include <SDL.h>
+
+namespace osgSDL
+{
+
+	struct Spaceball_data {
+	
+		enum ButtonMask {
+			BUTTON_1		= 1,
+			BUTTON_2		= 2,
+			BUTTON_3		= 4,
+			BUTTON_4		= 8,
+			BUTTON_5		= 16,
+			BUTTON_6		= 32,
+			BUTTON_7		= 64,
+			BUTTON_8		= 128,
+			BUTTON_9		= 256,
+			BUTTON_10		= 512,
+			BUTTON_11		= 1024,
+			BUTTON_12		= 2048,
+			BUTTON_LEFT		= 4096,
+			BUTTON_RIGHT	= 8192
+		};
+		
+		int tx, ty, tz;
+		int rx, ry, rz;
+		int buttons;
+	};
+
+	class OSGSDL_EXPORT Viewer: public osgGA::GUIActionAdapter {
+	public:
+		Viewer();		
+		virtual ~Viewer();
+		
+		inline int numViewports() const;
+		inline Viewport *getViewport(int i);
+		inline const Viewport *getViewport(int i) const;
+		inline void setViewport(int i, Viewport *vp);
+		inline void addViewport(Viewport *vp);
+		inline void removeViewport(int i);
+
+		inline int getActiveViewport() const;
+		inline void setActiveViewport(int i);
+
+		inline int getWidth() const;
+		inline int getHeight() const;
+
+		bool open(SDL_Surface *surf = 0);
+
+		void init();
+		void runOnce();
+
+		bool run();
+		void stop();
+		
+		inline bool isTerminated() const;
+
+		// --- Begin --- GUIActionAdapter implementation
+
+		void requestRedraw() {}
+		void requestContinuousUpdate(bool needed) { cont_update_ = needed? 1: 0; }
+		inline virtual void requestWarpPointer(float, float);
+
+		// --- End --- GUIActionAdapter implementation
+		
+		void readCommandLine(std::vector<std::string> &cmdline);
+		
+		bool setDisplayMode(int width, int height, int bpp, int flags = 0);
+		
+		inline const osg::DisplaySettings *getDisplaySettings() const;
+		inline osg::DisplaySettings *getDisplaySettings();
+		inline void setDisplaySettings(osg::DisplaySettings *ds);
+
+		inline const TimeSource *getTimeSource() const;
+		inline TimeSource *getTimeSource();
+		inline void setTimeSource(TimeSource *tsrc);
+
+		inline osg::FrameStamp *getFrameStamp();
+		inline const osg::FrameStamp *getFrameStamp() const;
+
+		inline double getLastFrameTime() const;
+
+		inline int numEventHandlers() const;
+		inline void addEventHandler(osgGA::GUIEventHandler *handler);
+		inline void removeEventHandler(int i);
+		
+		bool initSpaceball(const char *device);
+
+		void initClock();
+		
+		inline void setCursorEnabled(bool e);
+		inline void setCursor(Cursor *c);
+		
+		inline void processUserEvent(int code, void *data = 0, int datalen = 0, bool allviewports = false, bool forcebroadcast = false, bool skipdisabled = true);
+
+	protected:
+		Viewer(const Viewer &copy);
+		
+		inline void update(osgUtil::SceneView *sv);
+		inline void cull(osgUtil::SceneView *sv);
+		inline void draw(osgUtil::SceneView *sv);
+
+		bool call_global_handlers(const SDLEventAdapter &adapter, bool forcebroadcast);
+		bool call_viewport_handlers(const SDLEventAdapter &adapter, Viewport *vp, bool forcebroadcast);
+		void fire_event(const SDL_Event &event, bool allviewports = false, bool forcebroadcast = false, bool skipdisabled = true);
+		void poll_spaceball();
+
+		void app_idle();
+
+		inline void update_sceneview_viewport(Viewport *vp);
+
+	private:
+		typedef std::vector<osg::ref_ptr<Viewport> > Viewport_list;
+		typedef std::vector<osg::ref_ptr<osgGA::GUIEventHandler> > Event_handler_list;
+
+		Viewport_list viewports_;
+		int active_vp_;
+		SDL_Surface *surf_;
+		static Viewer *instance_;
+		bool terminated_;
+		osg::ref_ptr<osg::FrameStamp> frame_stamp_;	
+		osg::ref_ptr<TimeSource> tsrc_;
+		Event_handler_list hlist_;
+		int cont_update_;
+		float frametime_;
+		osg::ref_ptr<osg::DisplaySettings> disp_settings_;
+		osg::ref_ptr<osg::State> state_;
+		bool force_single_state_;
+		
+		void *spaceball_handle_;
+		
+		int planned_width_;
+		int planned_height_;
+		int planned_bpp_;
+		int planned_flags_;
+	};
+
+	// INLINE FUNCTIONS
+
+	inline int Viewer::numViewports() const
+	{
+		return static_cast<int>(viewports_.size());
+	}
+
+	inline Viewport *Viewer::getViewport(int i)
+	{
+		return viewports_[i].get();
+	}
+
+	inline const Viewport *Viewer::getViewport(int i) const
+	{
+		return viewports_[i].get();
+	}
+
+	inline void Viewer::setViewport(int i, Viewport *vp)
+	{
+		viewports_[i] = vp;
+	}
+
+	inline void Viewer::addViewport(Viewport *vp)
+	{
+		viewports_.push_back(vp);
+		if (active_vp_ < 0) setActiveViewport(0);
+	}
+
+	inline void Viewer::removeViewport(int i)
+	{
+		viewports_.erase(viewports_.begin()+i);
+		if (active_vp_ >= static_cast<int>(viewports_.size()))
+			active_vp_ = static_cast<int>(viewports_.size()-1);
+	}
+
+	inline int Viewer::getActiveViewport() const
+	{
+		return active_vp_;
+	}
+
+	inline void Viewer::setActiveViewport(int i)
+	{
+		if (viewports_[i]->getAllowFocus()) {
+			if (active_vp_ >= 0 && active_vp_ < static_cast<int>(viewports_.size())) {
+				viewports_[active_vp_]->setFocused(false);
+			}
+			active_vp_ = i;
+			viewports_[i]->setFocused(true);
+		}
+	}
+
+	inline int Viewer::getWidth() const
+	{
+		return surf_->w;
+	}
+
+	inline int Viewer::getHeight() const
+	{
+		return surf_->h;
+	}
+
+	inline bool Viewer::isTerminated() const
+	{
+		return terminated_;
+	}
+
+	inline void Viewer::update(osgUtil::SceneView *sv)
+	{
+		sv->update();
+	}
+
+	inline void Viewer::cull(osgUtil::SceneView *sv)
+	{
+		sv->cull();
+	}
+
+	inline void Viewer::draw(osgUtil::SceneView *sv)
+	{
+		sv->draw();
+	}
+
+	inline void Viewer::update_sceneview_viewport(Viewport *vp)
+	{
+		vp->getSceneView()->setViewport(
+						(int)vp->getPixelLeft(getWidth()), 
+						(int)(getHeight() - vp->getPixelTop(getHeight()) - vp->getPixelHeight(getHeight())), 
+						(int)vp->getPixelWidth(getWidth()),
+						(int)vp->getPixelHeight(getHeight()));
+	}
+
+	inline void Viewer::requestWarpPointer(float x, float y)
+	{
+		SDL_WarpMouse(static_cast<int>(x), static_cast<int>(y));
+	}
+
+	inline osg::FrameStamp *Viewer::getFrameStamp()
+	{
+		return frame_stamp_.get();
+	}
+
+	inline const osg::FrameStamp *Viewer::getFrameStamp() const
+	{
+		return frame_stamp_.get();
+	}
+
+	inline const TimeSource *Viewer::getTimeSource() const
+	{
+		return tsrc_.get();
+	}
+
+	inline TimeSource *Viewer::getTimeSource()
+	{
+		return tsrc_.get();
+	}
+
+	inline void Viewer::setTimeSource(TimeSource *tsrc)
+	{
+		tsrc_ = tsrc;
+	}
+
+	inline int Viewer::numEventHandlers() const
+	{
+		return static_cast<int>(hlist_.size());
+	}
+
+	inline void Viewer::addEventHandler(osgGA::GUIEventHandler *handler)
+	{
+		hlist_.push_back(handler);
+	}
+	
+	inline void Viewer::removeEventHandler(int i)
+	{
+		hlist_.erase(hlist_.begin()+i);
+	}
+
+	inline double Viewer::getLastFrameTime() const
+	{
+		return frametime_;
+	}
+	
+	inline void Viewer::processUserEvent(int code, void *data, int datalen, bool allviewports, bool forcebroadcast, bool skipdisabled)
+	{
+		SDL_UserEvent e;
+		e.type = SDL_USEREVENT;
+		e.code = code;
+		e.data1 = data;
+		e.data2 = &datalen;
+		fire_event(reinterpret_cast<const SDL_Event &>(e), allviewports, forcebroadcast, skipdisabled);
+	}
+	
+	inline const osg::DisplaySettings *Viewer::getDisplaySettings() const
+	{
+		return disp_settings_.get();
+	}
+	
+	inline osg::DisplaySettings *Viewer::getDisplaySettings()
+	{
+		return disp_settings_.get();
+	}
+	
+	inline void Viewer::setDisplaySettings(osg::DisplaySettings *ds)
+	{
+		disp_settings_ = ds;
+	}
+	
+	inline void Viewer::setCursorEnabled(bool e)
+	{
+		SDL_ShowCursor(e? SDL_ENABLE: SDL_DISABLE);
+	}
+	
+	inline void Viewer::setCursor(Cursor *c)
+	{
+		SDL_SetCursor(c->getSDLCursor());
+	}
+	
+}
+
+#endif
+

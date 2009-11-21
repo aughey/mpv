@@ -1,0 +1,312 @@
+plugins 
+{
+	// The plugins listed here will be loaded at run time.  Plugins are dynamic 
+	// library files (dll's on Windows, so's on Linux).  Each MPV plugin adds 
+	// some functionality or feature to the MPV.  Disabling a feature in the 
+	// MPV is simply a matter of not loading the corresponding plugin.
+	
+	// A description of each plugin can be found AT THE END OF THE FILE.
+	
+	// Plugins have a dependency system.  If a plugin is needed by another 
+	// plugin, it will be loaded automatically.
+	
+	// Be mindful of the order in which you list the plugins.  The plugins will 
+	// be executed in the order they are listed here.
+	// For example, it would be wise to place the entity manager plugin ahead 
+	// of the entity rendering plugin; this way, the entity renderer will have 
+	// the most up-to-date positions for the entities.  
+
+	filename = "PluginEntityMgr";
+	filename = "PluginTerrainMgr";
+	filename = "PluginSymbologyMgr";
+
+	filename = "PluginCoordinateConversionTM";
+
+	// the root of the scene graph is created here
+	filename = "PluginRenderOSG";
+
+	// If you want a static sky with static lighting, enable the RenderSkyOSG 
+	// and RenderAmbientLightOSG plugins, and disable the ephemeris plugins.
+	// If you want a dynamic sky with scene lighting that changes based on 
+	// the time of day, enable the ephemeris plugins and disable the 
+	// RenderSkyOSG and RenderAmbientLightOSG plugins.
+	// static skydome
+	filename = "PluginRenderSkyOSG";
+	// static lighting
+	filename = "PluginRenderAmbientLightOSG";
+
+	// dynamic sky and lighting
+//	filename = "PluginEphemerisModel";
+//	filename = "PluginRenderDynamicLightOSG";
+//	filename = "PluginRenderEphemerisOSG";
+
+	// adds fog to the scene
+//	filename = "PluginRenderAtmosphericOSG";
+	
+	// puts terrain in the scene
+	filename = "PluginRenderTerrainOSG";
+
+	// puts entities in the scene
+	filename = "PluginRenderEntsOSG";
+	
+	// for normal model-based entities
+	filename = "PluginRenderEntsModelFileOSG";
+	// for special effects entities
+	filename = "PluginRenderEntsParticleSysOSG";
+	// for putting a high-visibility "halo" around certain entities
+//	filename = "PluginRenderEntsHighVisibilityOSG";
+	// for rendering certain entities in the foreground (think cockpit mask)
+//	filename = "PluginRenderEntsNearModel";
+	// for putting text labels on entities
+//	filename = "PluginRenderEntsLabelsOSG";
+
+	// puts symbols and symbol surfaces in the scene
+	filename = "PluginRenderSymbologyOSG";
+
+	// distributes user input events to other plugins
+	filename = "PluginUserInputMgrOSGGA";
+	
+	// manages the camera matrices
+	filename = "PluginCameraMgrOSG";
+
+	// renders the scene
+	filename = "PluginRenderCameraCigiSDLOSG";
+
+	// takes screen shots and captures movies (very convenient)
+//	filename = "PluginVideoCapture";
+
+	// This plugin records timing information to a file (caution!)
+//	filename = "PluginExecLengthTiming";
+
+	// This plugin displays a frame-rate graph and other useful statistics.
+	// Try pressing the various F1 through F12 keys to see what's available.
+	filename = "PluginRenderStatisticsOSG";
+}
+
+/* 
+
+Plugin descriptions
+-------------------
+
+The plugins are listed here in the order that they should be loaded.  The order 
+is important.  
+
+pluginDefFileReader
+	This plugin loads configuration files and shares that data with the other 
+	plugins.  The order for this plugin is not critical.
+
+pluginEntityMgr
+	This plugin manages the entities in the simulation, and shares the entity 
+	info with the other plugins.  It is important that it is one of the first 
+	plugins loaded, so that the rest of the plugins have the most up-to-date 
+	entity locations every frame.
+	
+pluginTerrainMgr
+	Manages terrain databases and database-switching.
+
+pluginSymbologyMgr
+	Manages the symbols and symbol surfaces in the simulation.  The order for 
+	this plugin is not critical.
+
+pluginEnvRegionMgr
+	This plugin manages the environmental regions in the simulation, and shares 
+	that data with the other plugins.  The order for this plugin is not 
+	critical.
+	
+pluginGlobalWeatherMgr
+	This plugin manages the global weather state in the simulation, and shares 
+	that data with the other plugins.  The order for this plugin is not 
+	critical.
+
+pluginViewMgr
+	Manages and shares the view and view group info.
+	
+pluginCoordinateConversionMgr
+	Involved in performing coordinate transforms (lat/lon/alt to database 
+	coordinates, and vice versa).  Acts as an intermediary, making the 
+	functionality provided by the various coordinate-system-specific plugins 
+	available to the rest of the system.  Used by the entity manager.  
+	The order for this plugin is not critical.
+
+pluginCoordinateConversionTM
+	Contains functions for converting from lat/lon/alt to Transverse Mercator 
+	coordinates, and vice versa.  Works in 	conjunction with 
+	pluginCoordinateConversionMgr.  The order for this plugin is not critical.
+
+pluginMotionTrackerJoystickSDL
+	Can be used to simulate a motion tracker using a joystick.  If you use 
+	this plugin, you should disable the joystick feature in 
+	pluginRenderCameraCigiSDLOSG (see view.def).  This plugin should be loaded 
+	before the tracker manager plugin.
+
+pluginMotionTrackerRecvr
+	This plugin is a hack.  It handles the custom component control sent by 
+	pluginCigiManager.  The hack allows you to forward motion tracker data 
+	from one MPV to another.
+
+pluginMotionTrackerMgr
+	Manages and shares motion tracker data, handles boresight and status 
+	requests, etc.  Should be loaded after your motion tracker device-handling 
+	plugin(s), and before the camera matrix manager plugin.
+
+pluginCameraMgrOSG
+	Uses the motion tracker, view, and entity data to calculate the modelview 
+	matrix for each view.  The modelview matrices are posted to the 
+	blackboard, to be used by the rendering plugin (or anything else that wants 
+	to know where the camera is pointed).  This plugin also can use user input 
+	to position the camera, instead of CIGI data.  The 'c' key toggles this 
+	feature.  This plugin should be loaded after the motion tracker, view, and 
+	entity manager plugins, and before the rendering plugin.
+
+pluginEphemerisModel
+	Performs ephemeris calculations (sun/moon/star positions, sky colors, 
+	lighting parameters, etc) and shares the results.  Should be loaded after 
+	the entity manager, and before the ephemeris-rendering and dynamic-lighting 
+	plugins.
+
+pluginMissionFuncsMgr
+	Responds to mission function test requests from the Host.  The order for 
+	this plugin is not critical.
+	
+pluginMissionFuncsOSG
+	Uses the OSG scene to perform mission functions testing.  Works in 
+	conjunction with pluginMissionFuncsMgr.  The order for this plugin is 
+	not critical.
+
+pluginRenderOSG
+	Shares the root node of the scene graph.  That's it.  The order for this 
+	plugin is not critical.  
+	
+pluginRenderAmbientLightOSG
+	Sets static lighting parameters for the scene.  The order for this plugin 
+	is not critical.  Do not load this plugin and the dynamic lighting plugin 
+	at the same time.
+
+pluginRenderAtmosphericOSG
+	Sets fog parameters for the scene.  The order for this plugin is not 
+	critical.  
+	
+pluginRenderDynamicLightOSG
+	Sets lighting parameters for the scene, according to the output of the 
+	ephemeris model plugin.  If this plugin is loaded, the lighting angle, 
+	color and intensity will change as the sun/moon moves across the sky.  
+	This plugin should be loaded after the ephemeris model plugin.  
+	Do not load this plugin and the static lighting plugin at the same time.
+
+pluginRenderSkyOSG
+	Adds a static sky dome to the scene.  The skydome will be squished as 
+	altitude increases, to simulate the thinning of the atmosphere.
+	The order for this plugin is not critical.  Do not load this plugin and 
+	the ephemeris-rendering plugin at the same time.
+
+pluginRenderEphemerisOSG
+	Adds a sky dome to the scene, using the results from the ephemeris model 
+	plugin.  The sky colors and the positions of the sun, moon, and star field 
+	are driven by the ephemeris model.  This plugin should be loaded after 
+	the ephemeris model plugin.  Do not load this plugin and the static 
+	skydome plugin at the same time.
+
+pluginRenderTV
+	Uses the Video4Linux API to capture video from a video device, and place 
+	the output in a texture.  The texture is applied to a quad, which is 
+	placed in the scene background.  If you plan on using this for an 
+	augmented-reality type application, be sure to disable the sky, ephemeris, 
+	and fog plugins.  You'll probably also want to turn off the terrain plugin.
+
+pluginRenderTerrainOSG
+	Adds terrain to the scene, and changes that terrain model when the 
+	database id is changed by the Host.  To prevent transparency-related 
+	draw-order issues, this plugin should be loaded before the other 
+	rendering/scene-related plugins, with the possible exception of the 
+	skydome/ephemeris plugins.
+	
+pluginRenderEntsOSG
+	Adds entity models to the scene.  This plugin should be loaded after the 
+	entity manager.
+	
+pluginRenderEntsModelFileOSG
+	Adds model files to entities.  This is a rather important and basic 
+	feature, so you'll probably want to load this plugin.  The order for this 
+	plugin is not critical.  
+	
+pluginRenderEntsHighVisibilityOSG
+	Adds high-visibility spheres to entities of specified types.  We call these 
+	spheres "rookie dots", as they can help rookie pilots a great deal.  The 
+	spheres are also useful for debugging.  The order for this plugin is not 
+	critical.  
+	
+pluginRenderEntsLabelsOSG
+	Adds text labels to entities.  Useful for debugging.  The text can be set 
+	by the Host via a component control.  The order for this plugin is not 
+	critical.  
+	
+pluginRenderEntsParticleSysOSG
+	Adds particle systems to entities.  This is how we do our special effects, 
+	including explosions, vapor trails, smoke, etc.  The order for this plugin 
+	is not critical.  
+	
+pluginRenderEntsScale
+	Allows the Host to scale entities via a component control.  The order for 
+	this plugin is not critical.  
+	
+pluginRenderEntsNearModel
+	Manipulates the near and far clipping plane when rendering certain entities.
+	This allows the user to place geometry relatively close to the camera (such 
+	as a canopy model, for example) while still preventing z-fighting.  This 
+	plugin MUST be loaded after all the other entity-rendering-related plugins.
+	
+pluginRenderSymbologyCigiOSG
+	Adds symbols and symbol surfaces to the scene.  This plugin should be loaded 
+	after the entity rendering plugin.
+
+pluginRenderStatisticsOSG
+	Draws some useful statistics, such as a graph of the frame rate and a list 
+	of the active entities.  Also has some simple display test patterns.  
+	The order for this plugin is not critical.
+
+pluginSyncedRandomNumbers
+	Uses the frame counter to keep a consistent, synchronized source of random 
+	numbers.  This way, particle systems look the same across multiple 
+	rendering channels.  The order for this plugin is not critical.
+	
+pluginUserInputMgrOSGGA
+	Distributes user input events to the other plugins.  The order for this 
+	plugin is not critical.
+
+pluginRenderCameraCigiSDLOSG
+	Renders the scene.  Also creates the rendering context and translates 
+	SDL input events to OSGGA input events.
+	This plugin should be loaded after all the other scene-related plugins 
+	(especially the entity-rendering plugin) and after the camera-matrix 
+	plugin.  In fact, this should be the last plugin, or almost the last plugin.
+
+pluginVideoCapture
+	Captures the GL framebuffer contents and can record it to a number of 
+	output formats.  The plugin can output individual screen shot images, 
+	or (if you have the ffmpeg library) can stream MPV footage to a mpeg movie 
+	file or over the network.  
+	This plugin should be loaded after the scene-rendering plugin.
+
+pluginExecLengthTiming
+	Records timing information to disk.  Note that the name is misleading; 
+	this plugin does not perform the timing, it merely records the results.
+	Warning: the output file will get large quickly.  The order for this 
+	plugin is not critical.
+	
+pluginHTTPD
+	An experimental plugin that allows the user to change some view 
+	parameters via a web-based interface.  The plugin actually acts as an 
+	embedded web server, and communicates with the web browser directly.
+	Not actively maintained, but still interesting.  The order for this 
+	plugin is not critical.
+
+pluginCigiManager
+	Forwards all CIGI traffic that the MPV receives to a list of network 
+	addresses.  Note that the name is misleading; this plugin does not manage 
+	the host-bound CIGI connection.  This plugin is useful when creating a 
+	multi-channel MPV installation.  The order for this plugin is especially 
+	important; it must be loaded AFTER the rendering plugin.  This is due 
+	to a SOF-throttling mechanism... it's tough to explain.
+
+
+*/

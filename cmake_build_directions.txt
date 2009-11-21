@@ -1,0 +1,120 @@
+Build directions for building the MPV with CMake.  This has been tested under
+GCC/Linux and Visual Studio 8 SP1/Win32:
+
+Linux:
+======
+
+1. The MPV is compatable with any version of CMake >= 2.4.7 including 2.6.x.
+If CMake is not packaged for your distribution or you wish to obtain a newer
+version you can download from the following link:
+http://www.cmake.org/HTML/Download.html
+
+Due to bugs in FindBoost.cmake it is recommended you use the latest release
+from the CMake 2.6.x series.
+
+2. You can simply untar CMake and run it out of your home directory,
+or wherever.  It may even come with your distribution.
+
+3. In the location where your MPV source tree is:
+    mkdir build.linux
+    cd build.linux
+    ccmake ..
+
+4. Hit 'c' to configure
+
+5. Modify the CMAKE_BUILD_TYPE variable to be either "Debug" or "Release"
+
+6. Depending on where things are installed on your system everything may work
+out of the box, otherwise set the CCL_ROOT, OSG_ROOT, and SDL_ROOT to find
+those dependencies.  If for some reason the wrong version of OSG was detected
+delete all of the OSG varaibles except for OSG_ROOT, set OSG_ROOT to what you
+want it to be and then configure again.
+
+7. Hit 'c' to configure until no more variables change
+
+8. Hit 'g' to generate the Makefiles
+
+9. "make"
+
+10. Set your DEF_FILE_PATH environment variable (see the MPV documentation for
+more information on DEF files and/or the deffilesamples folder in the source
+tree).
+
+11. Run the following commands to run the MPV directly out of your build tree.
+    cd build.linux/bin
+    ./mpv
+
+NOTE: CMake will automagically find libosg.so, libosgdb.so, etc. when running
+the MPV out of your build tree thanks to the magic of RPATH but it may not
+find the OSG plugins.  You may need to add your OSG library prefix to your
+LD_LIBRARY_PATH.
+
+
+Visual Studio 8:
+================
+
+1. Download and Install CMake 2.6.x from http://www.cmake.org/HTML/Download.html
+
+2. If you have a compiled OSG >= 2.0.0 on Windows you want to use, skip to
+step 5.  Please note: You will need Debug builds of the OSG if you want to run
+a debug build of the MPV.
+
+3. If you don't already have a compiled MSVC OSG with debug/release libraries
+that you can use, download Mike Weiblan's VS8 prebuilt OSG 2.4.0 libraries and
+the associated DEBUG zip file from:
+    http://mew.cx/osg/
+
+4. Run the OSG 2.4.0 installer and unzip the files from the DEBUG zip file on
+top of C:\Program Files\OpenSceneGraph
+
+5. If you would like, perform an svn checkout of a few precompiled 3rd party
+dependencies (the CIGI Class Library, and the SDL) placing them in a folder
+called "3rdPartyMPV" alongside your MPV checkout (alternatively, build or
+obtain them yourself).
+    svn checkout https://yhbt.com/mpvdeps/branches/msvc_vs8sp1 C:\3rdPartyMPV
+
+6. Download Boost and place it in C:\boost\include
+    http://www.boost.org
+
+7. Run the CMake GUI
+	4a. For source code directory specify C:\mpv (or wherever you checked out
+the MPV)
+	4b. For where to build the binaries specify C:\mpv\build.msvc8
+
+8. Click Configure and choose Visual Studio 8
+
+9. If you get any errors at this point about missing libraries you can set
+CCL_ROOT, OSG_ROOT, or SDL_ROOT to point to the builds of the libraries you
+want to use.  If for some reason the wrong version of OSG was detected
+delete all of the OSG varaibles except for OSG_ROOT, set OSG_ROOT to what you
+want it to be and then configure again.
+
+10. Click Configure repeatedly until all cache variables have been set and
+there is no more "red" on the screen (indicating new or changed variables).
+
+11. Click OK to generate the build skeleton which will cause CMakeSetup to exit.
+
+12. Open the solution file created at C:\mpv\build.msvc8\mpv.sln
+
+13. Choose configuration type (Release, Debug, etc.) and build.
+
+14. Congratulations!  Before you run the MPV you'll need to do two more
+things
+
+15. First, copy all of the DLLs for the CIGI Class Library, SDL, and Boost
+Signals into the location where the mpv.exe is generated.
+(C:\mpv\build.msvc8\bin\Debug OR C:\mpv\build.msvc8\bin\Release)
+
+16. Secondly, copy all of the DLLs in the OpenSceneGraph/bin folder AS WELL AS
+the osgPlugins-2.x.y folder to where the mpv.exe is generated.
+
+17. Alternatively you can use the PATH environment variable to avoid having to
+perform steps 15 and 16.
+
+18. Set your DEF_FILE_PATH environment variable (see the MPV documentation for
+more information on DEF files and/or the deffilesamples folder in the source
+tree).
+
+SET DEF_FILE_PATH=C:\def_files
+
+19. Run mpv.exe

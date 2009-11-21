@@ -1,0 +1,29 @@
+system
+{
+	// The IP address of the host.
+	host_addr = "127.0.0.1";
+
+	// The port that the host will be listening on.
+	host_port = 8005;
+
+	// The port that this program should listen on 
+	// (the host should send messages *TO* this port).
+	listen_port = 8004;
+
+	// This value sets the frame-rate cap for the system.  The scene will be 
+	// drawn no more often than this many times per second.
+	// If you don't want any frame-rate cap at all, use a negative value, 
+	// like -1.
+	// For improved determinism, we recommend that you turn on sync-to-vertical 
+	// retrace, and set this value to -1.
+	hertz = -1;
+	
+	// The database to load on startup.  Use -128 to indicate that no 
+	// database should be loaded on startup.  FYI: The default "dummy" terrain 
+	// (a flat green field approx. 100km x 100km centered at the origin, with 
+	// white grid lines at 1km intervals) is used when there is no database 
+	// specified, and when there is an error loading a database.
+	default_database = 1;
+
+
+}

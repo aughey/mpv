@@ -1,0 +1,23 @@
+Restrictions:
+
+- group names and attribute names and attribute-strings-that-do-not-have-quotes must start with a letter
+- group names and attribute names and attribute-strings-that-do-not-have-quotes may contain only letters, numbers, and underscores
+- group names and attribute names and attribute-strings-that-do-not-have-quotes must be lower case
+- hexadecimal integer values must use only uppercase letters for the A-F digits
+(previous two restrictions could be lifted by enforcing that all hexadecimal integer values begin with "0x")
+- hexadecimal integer values which do not contain any A-F digits must begin with "0x", else they are interpreted as base-10 values
+UPDATE - the hex numbers are now interpreted as strings, I think.
+- floating point values must contain a decimal point, else they are interpreted as integers
+- attribute decls may not exist outside of a group
+- list attributes are comma-separated, and must contain at least two elements
+- list attributes must contain only numeric values; lists of strings are not handled
+- list attributes may contain any combination of floating point and integer values, but be aware that *all* list attributes will have their contents converted to floating point values, even if they contain only integers in the def file.  This is due to the inherent difficulty in dealing with mixtures of floating point and integer values in the list parsing code.  As a result of this, be aware that integers that are part of list attributes will not have the same properties (range of valid values, etc) as stand-alone integer attributes.
+
+Other items of interest:
+
+- "c-style" comments (ie /* ... */) and "c++-style" comments (ie // ... ) are both allowed
+- no whitespace or indentation rules are enforced (the .def authors are encouraged to follow the examples for the sake of consistency)
+- the attribute-declaration-terminator is the semicolon (";") and it is required after every attribute declaration
+- group nestings may be arbitrarily deep, and lists may be arbitrarily long 
+- groups may be empty
+- files may be empty

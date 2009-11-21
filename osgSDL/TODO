@@ -1,0 +1,5 @@
+TODO list:
+
+- add code to make osgSDL to work with pagedLOD
+- make libsball support a compile-time option which can be set when you run the 
+  configure script

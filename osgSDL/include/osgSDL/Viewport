@@ -1,0 +1,307 @@
+#ifndef OSGSDL_VIEWPORT_
+#define OSGSDL_VIEWPORT_ 1
+
+#include <osgSDL/Export>
+#include <osgSDL/SDLEventAdapter>
+
+#include <osg/Referenced>
+#include <osg/Node>
+#include <osg/Group>
+
+#include <osgUtil/SceneView>
+
+#include <osgGA/GUIEventHandler>
+#include <osgGA/MatrixManipulator>
+
+#include <SDL.h>
+
+namespace osgSDL
+{
+
+	class OSGSDL_EXPORT Viewport: public osg::Referenced {
+		friend class Viewer;
+	public:
+		explicit Viewport(osgUtil::SceneView *sv = 0);
+		explicit Viewport(osg::Node *node);
+		Viewport(float l, float t, float w, float h, osgUtil::SceneView *sv = 0);
+		Viewport(float l, float t, float w, float h, osg::Node *node);
+
+		inline float getLeft() const;
+		inline float getTop() const;
+		inline float getWidth() const;
+		inline float getHeight() const;
+		
+		inline float getPixelLeft(float scrw) const;
+		inline float getPixelTop(float scrh) const;
+		inline float getPixelWidth(float scrw) const;
+		inline float getPixelHeight(float scrh) const;
+
+		inline osgUtil::SceneView *getSceneView();
+		inline const osgUtil::SceneView *getSceneView() const;
+
+		inline bool isEnabled() const;
+
+		inline void setLeft(float v);
+		inline void setTop(float v);
+		inline void setWidth(float v);
+		inline void setHeight(float v);
+
+		inline void setSceneView(osgUtil::SceneView *sv);
+
+		inline void setEnabled(bool v);
+
+		inline void setRect(float l, float t, float w, float h);
+
+		inline int numEventHandlers() const;
+		inline void addEventHandler(osgGA::GUIEventHandler *handler);
+		inline const osgGA::GUIEventHandler *getEventHandler(int i) const;
+		inline osgGA::GUIEventHandler *getEventHandler(int i);
+
+		inline const osgGA::MatrixManipulator *getMatrixManipulator() const;
+		inline osgGA::MatrixManipulator *getMatrixManipulator();
+		inline void setMatrixManipulator(osgGA::MatrixManipulator *cm);
+		
+		inline int numAdditionalNodes() const;
+		inline void addAdditionalNode(osg::Node *n);
+		inline void removeAdditionalNode(osg::Node *n);
+		inline osg::Node *getAdditionalNode(int i);
+		
+		inline void attachAdditionalNodes();
+		inline void detachAdditionalNodes();
+		inline void setAdditionalNodesEnabled(bool v = true);
+		inline bool getAdditionalNodesEnabled() const;
+		
+		inline bool getAllowFocus() const;
+		inline void setAllowFocus(bool v);
+		
+		void createViewportFrame();
+		
+		inline bool isFocused() const;
+		
+	protected:
+		virtual ~Viewport();
+		Viewport &operator=(const Viewport &) { return *this; }
+		
+		inline void setFocused(bool v);
+		
+	private:
+		typedef std::vector<osg::ref_ptr<osgGA::GUIEventHandler> > Event_handler_list;
+		
+		void SetupDatabasePager();
+
+		Event_handler_list hlist_;
+		float left_;
+		float top_;
+		float width_;
+		float height_;
+		osg::ref_ptr<osgUtil::SceneView> sceneview_;
+		osg::ref_ptr<osgGA::MatrixManipulator> cmanip_;
+		bool enabled_;
+		osg::ref_ptr<osg::Group> add_nodes_;
+		bool allow_focus_;		
+		bool focused_;		
+	};
+
+	// INLINE FUNCTIONS
+
+	inline float Viewport::getLeft() const
+	{
+		return left_;
+	}
+
+	inline float Viewport::getTop() const
+	{
+		return top_;
+	}
+
+	inline float Viewport::getWidth() const
+	{
+		return width_;
+	}
+
+	inline float Viewport::getHeight() const
+	{
+		return height_;
+	}
+
+	inline osgUtil::SceneView *Viewport::getSceneView()
+	{
+		return sceneview_.get();
+	}
+
+	inline const osgUtil::SceneView *Viewport::getSceneView() const
+	{
+		return sceneview_.get();
+	}
+
+	inline bool Viewport::isEnabled() const
+	{
+		return enabled_;
+	}
+
+	inline void Viewport::setLeft(float v)
+	{
+		left_ = v;
+	}
+
+	inline void Viewport::setTop(float v)
+	{
+		top_ = v;
+	}
+
+	inline void Viewport::setWidth(float v)
+	{
+		width_ = v;
+	}
+
+	inline void Viewport::setHeight(float v)
+	{
+		height_ = v;
+	}
+
+	inline void Viewport::setSceneView(osgUtil::SceneView *sv)
+	{
+		sceneview_ = sv;
+	}
+
+	inline void Viewport::setEnabled(bool v)
+	{
+		enabled_ = v;
+	}
+
+	inline void Viewport::setRect(float l, float t, float w, float h)
+	{
+		left_ = l;
+		top_ = t;
+		width_ = w;
+		height_ = h;
+	}
+
+	inline int Viewport::numEventHandlers() const
+	{
+		return static_cast<int>(hlist_.size());
+	}
+
+	inline void Viewport::addEventHandler(osgGA::GUIEventHandler *handler)
+	{
+		hlist_.push_back(handler);
+	}
+
+	inline const osgGA::GUIEventHandler *Viewport::getEventHandler(int i) const
+	{
+		return hlist_[i].get();
+	}
+
+	inline osgGA::GUIEventHandler *Viewport::getEventHandler(int i)
+	{
+		return hlist_[i].get();
+	}
+
+	inline const osgGA::MatrixManipulator *Viewport::getMatrixManipulator() const	
+	{
+		return cmanip_.get();
+	}
+
+	inline osgGA::MatrixManipulator *Viewport::getMatrixManipulator()
+	{
+		return cmanip_.get();
+	}
+
+	inline void Viewport::setMatrixManipulator(osgGA::MatrixManipulator *cm)
+	{
+		cmanip_ = cm;
+	}
+	
+	inline int Viewport::numAdditionalNodes() const
+	{
+		return add_nodes_->getNumChildren();
+	}
+
+	inline void Viewport::addAdditionalNode(osg::Node *n)
+	{
+		add_nodes_->addChild(n);
+	}
+	
+	inline void Viewport::removeAdditionalNode(osg::Node *n)
+	{
+		add_nodes_->removeChild(n);
+	}
+	
+	inline osg::Node *Viewport::getAdditionalNode(int i)
+	{		
+		return add_nodes_->getChild(i);
+	}
+	
+	inline void Viewport::attachAdditionalNodes()
+	{
+		if (sceneview_.valid()) {
+			osg::Group *data = dynamic_cast<osg::Group *>(sceneview_->getSceneData());
+			if (data) {
+				data->addChild(add_nodes_.get());
+			}
+		}
+	}
+	
+	inline void Viewport::detachAdditionalNodes()
+	{
+		if (sceneview_.valid()) {
+			osg::Group *data = dynamic_cast<osg::Group *>(sceneview_->getSceneData());
+			if (data) {
+				data->removeChild(add_nodes_.get());
+			}
+		}
+	}
+	
+	inline float Viewport::getPixelLeft(float scrw) const
+	{
+		return floorf(getLeft() * scrw);
+	}
+	
+	inline float Viewport::getPixelTop(float scrh) const
+	{
+		return floorf(getTop() * scrh);
+	}
+	
+	inline float Viewport::getPixelWidth(float scrw) const
+	{
+		return ceilf(getWidth() * scrw);
+	}
+	
+	inline float Viewport::getPixelHeight(float scrh) const
+	{
+		return ceilf(getHeight() * scrh);
+	}
+	
+	inline bool Viewport::getAllowFocus() const
+	{
+		return allow_focus_;
+	}
+	
+	inline void Viewport::setAllowFocus(bool v)
+	{
+		allow_focus_ = v;
+	}
+		
+	inline bool Viewport::isFocused() const
+	{
+		return focused_;
+	}
+	
+	inline void Viewport::setFocused(bool v)
+	{
+		focused_ = v;
+	}
+
+	inline void Viewport::setAdditionalNodesEnabled(bool v)
+	{
+		add_nodes_->setNodeMask(v? 0xffffffff: 0);
+	}
+	
+	inline bool Viewport::getAdditionalNodesEnabled() const
+	{
+		return add_nodes_->getNodeMask() != 0;
+	}
+	
+}
+
+#endif

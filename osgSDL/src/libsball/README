@@ -1,0 +1,161 @@
+*****************************************************************************
+* THIS LIBRARY HAS BEEN MODIFIED (see source code comments). THE FOLLOWING  *
+* TEXT REFERS TO THE ORIGINAL VERSION.                                      *
+*                                                                           *
+*                                                 Marco Jez, 9/7/2002       *
+*****************************************************************************
+
+
+
+
+Libsball 1.0 -- Copyright 1999-2001, John E. Stone (johns@megapixel.com)
+----------------------------------------------------------------------------
+
+Version 1.0 Release Notes
+-------------------------
+  Libsball is a very simple implementation of a protocol driver
+that reads output from the Spaceball 6DOF 3-D controller manufactured 
+by 3Dconnexion, Labtec, SpaceTec IMC, and other previous corporate owners.  
+(see device description below if you are unfamiliar with the concept)
+
+Libsball provides a simple interface to the Spaceball on a Unix system 
+through the use of POSIX compliant termios RS-232 serial communication 
+routines.  The main advantage of Libsball over the vendor-provided 
+drivers is that it is free, open source, and can be built into an 
+application even on platforms not supported by the vendor-provided 
+drivers.  Also, Libsball by its nature, does not require the use
+of windowing system services, so it can be used with software like
+VRPN that acts as a "network server".
+
+Libsball has been successfully used on OpenBSD, Solaris, IRIX, HP-UX, 
+Tru64 Unix, AIX, and several flavors of Linux.  Libsball has also been 
+integrated into several popular visualization and rendering packages, and
+its core code has also been ported to various VR and tracker libraries such
+as the NCSA CAVE, FreeVR, and VRPN.
+
+
+Notes on compiling Libsball and running the test program on Unix systems
+------------------------------------------------------------------------
+  The Makefile supplied with libsball assumes a generic ANSI C compiler
+on a POSIX compliant Unix system.  If your C compiler is named something
+other than "cc" or you would like to alter compilation flags etc, go ahead
+and edit the Makefile appropriately.  Please send the author any patches
+required for building and running libsball on new systems.  To build a 
+static link library "libsball.a" and a "testsball" program that displays the
+state of the Spaceball in a command window, just type "make".
+Once libsball.a and the test program have been built, run the test program
+with the system serial port device name which the Spaceball is attached to as
+an argument.  Example: "testsball /dev/ttya"  If libsball fails to properly
+open and initialize the serial port, it will print an error and exit.
+If the test program succeeds in opening the serial port, it will begin
+printing the status of the attached Spaceball as shown below:
+
+  thor - johns:/disk5/users/johns/graphics/libsball % testsball /dev/ttya
+  Spaceball Unix test program, by John Stone
+  Opening Spaceball: using port /dev/ttya for I/O
+  Sucessfully opened Spaceball port.
+  Monitoring Spaceball, press button 1 on Spaceball, or ctrl-c to exit.
+  
+  tx:   5 ty:-123 tz: -98 rx:-117 ry:  36 rz: -29 buttons:00
+
+(after pressing the "a" button on the Spaceball, the test program will exit)
+
+  Spaceball test complete.
+  Closing down Spaceball port.
+
+Building the "sballfly" demo program
+------------------------------------
+  Once you've built and tested the library using the "testsball" 
+program, you can try out "sballfly" another simple program included
+in the sballfly subdirectory.  You'll need to edit the Makefile for
+your OpenGL configuration, but it should be pretty self explanatory.
+
+What is a Spaceball and how does it work?
+--------------------------------------------
+  The Spaceball is an input device with a six degree of 
+freedom ball controller, and 9 buttons.  The Spaceball communicates
+with the host computer via standard RS-232, at 9600 baud, no parity, 
+8 data bits and 1 stop bit.  The Spaceball generates bursts of "events" 
+when the ball is pushed or twisted, or when buttons are pressed.  
+
+How do I use the Spaceball and libsball in a 3-D application?
+--------------------------------------------------------------
+  The best way to use a Spaceball with 3-D applications is to
+use the translational and rotational deltas from the Spaceball to alter
+transformation matrices used in an application.  In a 3-D cad or
+object editing system, the Spaceball might be used to position objects in space.
+In a 3-D fly-through, games, or virtual reality type applications, the
+Spaceball could be used to fly the camera or player around in space.
+
+  In either case, libsball simply provides the translation and rotation
+values read directly from the Spaceball itself.  In order to uses these
+values, they must be processed and used to create 3-D transformations.
+Common processing operations on the raw Spaceball output might include scaling,
+value clamping, and software sensitivity controls.  New Spaceball users often
+find that it is very sensitive and they have a difficult time getting used
+to it when its run at full sensitivity.  A better way of using the Spaceball 
+output is to scale it to some useful units, and to write software that provides
+a "NULL" region, or areas where displacements below a certain threshold are
+ignored.  This allows new Spaceball users to gradually become accustomed to the 
+sensitivity of the device.  As the Spaceball user's skill improves, the size
+of the "NULL" region can be decreased allowing the Spaceball to be used at
+full precision and sensitivity.
+
+  In order to construct a transformation matrix from the output of the space
+Spaceball, it is a good idea to use quaternions for representing rotations.  
+Ball rotational displacement events can be easily converted into quaternions,
+and the quaternions can be used to generate transformation matrices.
+
+At this time, libsball does not include code for the creation and maintenance
+of quaternions or transformation matrices, although such code has been written.
+The feedback and suggestions of libsball users will be used to determine
+an appropriate set of features for adding such support to libsball.
+
+
+Writing a code to use Libsball
+------------------------------
+  In order to use libsball, the minimal steps necessary to get it initialized
+and talking to the attached Spaceball are:
+
+    1) call sball_open() with the tty/serial port device name that the
+       Spaceball is connected to.  i.e.  sball_open("/dev/ttya");
+       sball_init() returns a void * handle which is used in all following
+       sball_xxx() calls.  If sball_open() fails to open the tty/serial port
+       it will return NULL.
+
+    2) call sball_getstatus() to retrieve current displacement and button
+       status.  sball_getstatus() returns an integer flag which is 0 when
+       there was no change in status to report, and returns a 1 if status
+       information was reported.  The parameters to sball_getstatus() are
+       the Spaceball handle, and pointers to integers for tx, ty, tz, 
+       rx, ry, rz, and buttons.  Buttons are stored as bits in the lowest 12 
+       bits of buttons.  Buttons are 1 if pressed, and 0 if unpressed.  
+       Buttons are conveniently handled by ANDing with one of the button
+       masks defined in sball.h.
+
+       Spaceball translation and rotation values are stored in the six integer
+       parameters as signed values which range from -32767 to +32767.
+       sball_getstatus() is currently implemented as a polling function,
+       and does not actively request a status report from the Spaceball,
+       so it will only report events that are generated by the Spaceball
+       itself.  
+
+    3) sball_close() free's the handle and closes the serial port to
+       the Spaceball device.
+
+    Other sball_xxx() functions are listed in sball.h, but may not be ready
+    for real use at this time.  In this release sball_open() does not
+    attempt to perform any auto-detection or verification of the existence
+    of a Spaceball on the requested tty/serial port, it will assume that
+    an Spaceball is there, and will wait for event packets.  Future revisions of
+    libsball should perform a verification check on startup to make sure
+    that a Spaceball is actually present on the serial port, and is 
+    communicating properly.  sball_open() will currently return an error
+    only if the specified port cannot be opened.
+
+Trademarks
+----------
+  Spaceball is a trademark of SpaceTec IMC.
+  SparcStation, and Ultra are trademarks of Sun Microsystems Inc.
+  SGI, and IRIX are trademarks of Silicon Graphics Inc.
+

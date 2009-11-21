@@ -1,0 +1,36 @@
+CFLAGS=-g -Wall
+# CFLAGS+=-O3 -mpentium
+#CXXFLAGS=$(CFLAGS) -I/home/david/WorkProjects/OpenSceneGraph/OpenSceneGraph_SubSpace/local/include
+#LDFLAGS=-g -Wall -L/home/david/WorkProjects/OpenSceneGraph/OpenSceneGraph_SubSpace/local/lib
+CXXFLAGS=$(CFLAGS)
+LDFLAGS=-g -Wall
+LDLIBS=-losg -losgUtil -lOpenThreads -losgProducer -lProducer -losgGA -losgDB \
+	-losgText
+
+.PHONY: all clean
+
+# Linking using the c++ compiler
+LINK.o=$(CXX) $(LDFLAGS) $(TARGET_ARCH)
+
+PROGS=osgviewer tvTest
+all: osgviewer tvTest
+
+clean:
+	rm -f *.o $(PROGS)
+
+#	$(MAKE) -C $(NETDIR) clean
+
+osgviewer: osgviewer.o osgTV.o Video.o
+
+osgTV.o: osgTV.cc osgTV.h Video.h
+
+osgviewer.o: osgviewer.cpp osgTV.h Video.h
+
+Video.o: Video.cc Video.h
+
+tvTest.o: Video.h
+
+# just standard libraries for now
+tvTest_LDLIBS=
+tvTest: tvTest.o Video.o
+	$(LINK.o) $^ $(tvTest_LDLIBS) -o $@

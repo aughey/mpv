@@ -1,0 +1,66 @@
+#ifndef VIEWPORTFOCUSHANDLER_
+#define VIEWPORTFOCUSHANDLER_ 1
+
+#include <osgGA/GUIEventHandler>
+#include <osgGA/GUIEventAdapter>
+#include <osgGA/GUIActionAdapter>
+
+#include <osgSDL/Viewer>
+
+namespace osgSDL
+{
+
+	class ViewportFocusHandler: public osgGA::GUIEventHandler {
+	public:	
+		inline ViewportFocusHandler(Viewer *viewer);
+
+		inline bool handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &us);
+		inline void accept(osgGA::GUIEventHandlerVisitor &) {}
+
+	protected:
+		inline int find_viewport(int x, int y);
+		
+	private:
+		Viewer *viewer_;
+	};
+	
+	// INLINE METHODS
+	
+	inline ViewportFocusHandler::ViewportFocusHandler(Viewer *viewer)
+		: osgGA::GUIEventHandler(), viewer_(viewer)
+	{
+		if (!viewer_) throw "ViewportFocusHandler: invalid viewer object";
+	}
+
+	inline bool ViewportFocusHandler::handle(const osgGA::GUIEventAdapter &ea, osgGA::GUIActionAdapter &us)
+	{
+		if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH) {
+			if ((ea.getButtonMask() & osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) != 0) {
+				int i = find_viewport(ea.getX(), ea.getY());
+				if (i != -1 && i != viewer_->getActiveViewport()) {
+					viewer_->setActiveViewport(i);						
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	inline int ViewportFocusHandler::find_viewport(int x, int y)
+	{
+		for (int i=viewer_->numViewports()-1; i>=0; --i) {
+			const Viewport *vp = viewer_->getViewport(i);
+			if (vp->isEnabled()) {
+				float x1 = vp->getPixelLeft(viewer_->getWidth());
+				float y1 = vp->getPixelTop(viewer_->getHeight());
+				float x2 = x1 + vp->getPixelWidth(viewer_->getWidth())-1;
+				float y2 = y1 + vp->getPixelHeight(viewer_->getHeight())-1;
+				if (x >= x1 && x <= x2 && y >= y1 && y <= y2) return i;
+			}
+		}
+		return -1;
+	}
+
+}
+
+#endif

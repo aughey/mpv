@@ -1,0 +1,117 @@
+#ifndef OSGSDL_VIEWPORTFRAME_
+#define OSGSDL_VIEWPORTFRAME_
+
+#include <osg/CopyOp>
+#include <osg/Object>
+#include <osg/Drawable>
+
+#include <osgSDL/Viewport>
+
+namespace osgSDL
+{
+
+	class ViewportFrame: public osg::Drawable {
+	public:
+		explicit inline ViewportFrame(Viewport *viewport = 0);
+		inline ViewportFrame(float w, float h, Viewport *viewport = 0);
+		inline ViewportFrame(const ViewportFrame &copy, const osg::CopyOp &copyop = osg::CopyOp::SHALLOW_COPY);
+
+		META_Object(osgSDL, ViewportFrame);
+		
+		inline void setViewport(Viewport *viewport);
+
+		inline virtual void drawImplementation(osg::RenderInfo &renderInfo) const;
+		inline virtual osg::BoundingBox computeBound() const;
+
+		inline float &w();
+		inline const float &w() const;
+		inline float &h();
+		inline const float &h() const;
+		
+	protected:
+		virtual ~ViewportFrame() {}
+		ViewportFrame &operator=(const ViewportFrame &) { return *this; }
+
+	private:
+		float w_;
+		float h_;
+		osg::ref_ptr<Viewport> viewport_;
+	};
+
+	// INLINE METHODS
+
+	inline ViewportFrame::ViewportFrame(Viewport *viewport)
+		: osg::Drawable(), w_(1024), h_(768), viewport_(viewport)
+	{
+		setSupportsDisplayList(false);
+	}
+
+	inline ViewportFrame::ViewportFrame(float w, float h, Viewport *viewport)
+		: osg::Drawable(), w_(w), h_(h), viewport_(viewport)
+	{
+		setSupportsDisplayList(false);
+	}
+
+	inline ViewportFrame::ViewportFrame(const ViewportFrame &copy, const osg::CopyOp &copyop)
+		: osg::Drawable(copy, copyop), w_(1024), h_(768), viewport_(copy.viewport_)
+	{
+		setSupportsDisplayList(false);
+	}
+	
+	inline void ViewportFrame::setViewport(Viewport *viewport)
+	{
+		viewport_ = viewport;
+	}
+
+	inline void ViewportFrame::drawImplementation(osg::RenderInfo &renderInfo) const
+	{
+		if (!viewport_.valid()) return;
+		
+		if (viewport_->isFocused()) {
+			glColor4f(1, 1, 0.5f, 1);
+			glLineWidth(5.0f);
+		} else {
+			glColor4f(0.75f, 0.75f, 0.75f, 1);
+			glLineWidth(1.0f);
+		}
+
+		glBegin(GL_LINE_STRIP);
+		glVertex2f(0, 0);
+		glVertex2f(0, h_-1);
+		glVertex2f(w_-1, h_-1);
+		glVertex2f(w_-1, 0);
+		glVertex2f(0, 0);
+		glEnd();
+	}
+
+	inline osg::BoundingBox ViewportFrame::computeBound() const
+	{
+		_boundingBox._min.set(0, 0, 0);
+		_boundingBox._max.set(w_, h_, 0);
+		_boundingBoxComputed = true;
+		return _boundingBox;
+	}
+
+	inline float &ViewportFrame::w()
+	{
+		return w_;
+	}
+
+	inline const float &ViewportFrame::w() const
+	{
+		return w_;
+	}
+
+	inline float &ViewportFrame::h()
+	{
+		return h_;
+	}
+
+	inline const float &ViewportFrame::h() const
+	{
+		return h_;
+	}
+
+}
+
+#endif

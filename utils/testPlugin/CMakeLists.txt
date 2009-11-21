@@ -1,0 +1,5 @@
+IF(UNIX)
+    ADD_EXECUTABLE(testPluginUtil testPluginUtil.c)
+    FIND_LIBRARY(dl NAMES dl)
+    TARGET_LINK_LIBRARIES(testPluginUtil ${dl})
+ENDIF(UNIX)

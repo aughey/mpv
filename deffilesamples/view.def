@@ -1,0 +1,139 @@
+/*
+This file allows you to define the views that the MPV should render.
+The settings here should be familiar to those who have worked with CIGI.
+Here you can specify defaults for things like the FOV, near/far clipping 
+plane distances, etc.  Nearly all of these values can be overridden by the 
+Host.
+
+Initial view offsets and orientations can be specified using the "offset" 
+and "rotation" attributes.  
+The order for the values in the "offset" attribute is forward, right, down.  
+That is, +x points out the front of the entity, +y points out the right, 
+and +z points down.  The units are meters.
+The order for the values in the "rotation" attribute are yaw, pitch, roll.  
+The units are degrees.
+The Host can change these values at run time by sending a View Control 
+packet.
+
+Multiple viewports:
+The MPV can run with more than one viewport displayed within a single window.
+This allows you to render more than one CIGI view with a single machine.
+This has advantages over running multiple instances of the MPV on the same 
+machine.  (Of course, you're always better off running each view on its own 
+separate computer.)
+If you want to set up the MPV to render more than one view in a single 
+window, specify multiple "view" sections in this file, one after the other.  
+Make sure you change the id attributes, and the viewport_* attributes.  If, 
+for example, you wanted two views side-by-side, you'd specify:
+For the left viewport:
+ viewport_left:   0.0
+ viewport_top:    0.0
+ viewport_width:  0.5
+ viewport_height: 1.0
+For the right viewport:
+ viewport_left:   0.5
+ viewport_top:    0.0
+ viewport_width:  0.5
+ viewport_height: 1.0
+
+Note that viewports can overlap.  You can also set up a picture-in-picture.
+
+Note that the MPV can not create multiple windows.  The multiple-viewport 
+feature is just subdividing a single window.
+
+*/
+
+window
+{
+	// Only one window section is permitted.
+	
+	// The resolution for the window.  If fullscreen is enabled, the screen will 
+	// be switched to this resolution.  If fullscreen is disabled, this will 
+	// determine the dimensions of the GL window.
+	width = 800;
+	height = 600;
+	
+	fullscreen = off; // on or off
+	
+	// If set to true, the mpv camera plugin will attempt to use the joystick 
+	// to move the view around when in "untethered" mode (just like the mouse).
+	// You might want to set this to false if you are running other applications 
+	// (or plugins!) which use the joystick.
+	use_joystick = true;
+	
+	// The string to display in the window title bar.  This is especially 
+	// useful for differentiating one instance of the MPV from another, 
+	// if you're running more than one instance on the same machine.
+	// The default value is "Multi-Purpose Viewer".
+//	title = "Example Text";
+}
+
+view
+{
+	// Multiple view sections can be specified.
+	
+	name			= "forward_center";
+	id			= 0;			// 0 to 31
+	group			= 0;			// 0 to 7
+	type			= 0;			// 0 to 7
+	entity_id		= 0;			// 0 to 65535
+	
+	parallel_projection = false;	// true or false
+
+	fov_left		= -20;	// -89.9 to 89.9 degrees
+	fov_right		= 20;	// -89.9 to 89.9 degrees
+	fov_top			= 15;	// -89.9 to 89.9 degrees
+	fov_bottom		= -15;	// -89.9 to 89.9 degrees
+
+	near_plane		= 3.00;			// 1 to max float value meters
+	far_plane		= 50000.0;		// near_plane+1 to max float value meters
+
+	/*
+	Orthographic (parallel) projections work too.  The FOV for orthographic 
+	views is specified in degrees, just like perspective views.  However, 
+	the near-plane distance is used in combination with the left/right/up/down 
+	angles to determine the size of the viewing prism.  Check out sections 
+	3.2.1.2 and 4.1.21 of the CIGI 3.3 ICD for a more complete explanation, 
+	including diagrams.
+	
+	Some sample values for an orthographic projection:
+	
+	parallel_projection = true;	// true or false
+	
+	fov_left   = -73;		// -89.9 to 89.9 degrees
+	fov_right  = 73;		// -89.9 to 89.9 degrees
+	fov_top    = 68;		// -89.9 to 89.9 degrees
+	fov_bottom = -68;		// -89.9 to 89.9 degrees
+	near_plane = 30.00;		// 1 to max float value meters
+	far_plane  = 50000.0;	// near_plane+1 to max float value meters
+	
+	The above values will result in an orthographic projection that covers 
+	approximately 196.251 meters wide by 148.505 meters tall.
+	
+	The math, if you're interested:
+		tan(73) * 30 * 2 = 196.251
+		tan(68) * 30 * 2 = 148.505
+	*/
+
+//	pixel_replication	= 0;			// 0 = No Replicate
+							// 1 = 1x2 Pixel Replicate
+							// 2 = 2x1 Pixel Replicate
+							// 3 = 2x2 Pixel Replicate
+	mirror			= 0;			// 0 = None
+							// 1 = Horizontal
+							// 2 = Vertical
+							// 3 = Horizontal and Vertical
+	
+	// The following 4 options are only useful when running the MPV with 
+	// more than one viewport
+//	viewport_left = 0.0;	// 0 to 1 - x coord for upper-left corner of this viewport
+//	viewport_top = 0.0;		// 0 to 1 - y coord for upper-left corner of this viewport
+//	viewport_width = 1.0;	// 0 to 1 - width of this viewport, relative to size of MPV window
+//	viewport_height = 1.0;	// 0 to 1 - height of this viewport, relative to size of MPV window
+	
+	// Initial view offset and orientation.  The Host can change these 
+	// by sending a View Control.
+	offset = 0.0, 0.0, 0.0;
+	rotation = 0.0, 0.0, 0.0;
+}
+

@@ -1,0 +1,56 @@
+
+// Arguments for the various coordinate systems:
+// GCC:
+//     [none, at the moment]
+//
+// TM:
+//     central_meridian
+//     false_easting
+//     false_northing
+//     scale_factor
+//     
+// LCC:
+//     latitude_origin
+//     longitude_origin
+//     equ_lat
+//     pol_lat
+//     linear_units
+//     orientation_units
+//     options
+//     
+// NOTE: The public version of the MPV supports only TM databases.
+// 
+// FALSE NORTHING FOR TM DATABASES:
+// False northing is the number of meters from the equator to the database's 
+// origin.  If the origin is north of the equator, you want to use a negative 
+// number.  If it is instead in the southern hemisphere, you want to use a 
+// positive number.
+// Calculating this number seems to be a bit of a dark art, but the easiest 
+// way to get an accurate number is to use the ccu and feed it some data with 
+// false northing set to zero, and request a conversion for the DB's origin 
+// point.
+// Rough estimate for most databases:
+// latitude (in degrees) x 60 x 6076 x 0.3048 x -1.0
+// 
+
+
+databases
+{
+
+	// these values correspond to the database distributed in the 
+	// mpv content archive, available through the CIGI sourceforge site
+	database
+	{
+		name = "St. Louis";
+		id = 1;
+		directory = "/opt/data/terrain/StLouis_5m_512/";
+		filename = "archive.txp";
+		coordinate_system = TM;
+		// latitude of origin is 38.624670999999999
+		central_meridian = -90.184962999999996;
+		false_easting = 0.0;
+		false_northing = -4275127.23399095;
+		scale_factor = 0.9996;
+	}
+
+}

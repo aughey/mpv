@@ -1,0 +1,17 @@
+MPV_PLUGIN_INIT(PluginS11nRoot)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/commonS11n)
+
+SET(PluginS11nRoot_PRIVATE_HDRS
+	PluginS11nRoot.h
+)
+SET(PluginS11nRoot_SRCS
+	PluginS11nRoot.cpp
+)
+
+ADD_LIBRARY(PluginS11nRoot MODULE
+	${PluginS11nRoot_PUBLIC_HDRS}
+	${PluginS11nRoot_PRIVATE_HDRS}
+	${PluginS11nRoot_SRCS})
+MPV_PLUGIN_PROCESS_TARGET(PluginS11nRoot)
+
+TARGET_LINK_LIBRARIES(PluginS11nRoot mpvcommon mpvcommons11n)

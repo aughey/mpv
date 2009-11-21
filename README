@@ -1,0 +1,125 @@
+CIGI Multi-Purpose Viewer
+Basic Installation and Usage
+
+Contact(s): Andrew Sampson, Greg Basler
+See the cigi.sourceforge.net web site for contact information.
+
+The Multi-Purpose Viewer (MPV) is part of the Common Image Generator Interface 
+(CIGI) testing suite.  It performs many of the basic functions of an IG.  Host 
+software developers who do not have access to a full-blown IG can use the MPV 
+to test their software.  IG software developers who would like a "reference" 
+CIGI implementation can use the MPV to determine how a CIGI IG should behave 
+in a given situation.
+
+The MPV is not a complete IG implementation.  It does not feature weather 
+effects or sensor simulation.  The MPV also does not claim to be 
+"deterministic", meaning that there is no guarantee that the framerate will be 
+smooth.
+
+
+COMPILING
+=========
+
+Prior to MPV 2.1.0, this README contained some information on compiling the 
+MPV.  The information was hopelessly out of date, and was removed.  
+
+For information on compiling the MPV, refer to the cmake_build_directions.txt 
+included in the source archive.  For information on the MPV dependencies, 
+such as which version of OSG to use, refer to the CIGI web site, at:
+    http://cigi.wiki.sourceforge.net/mpv-user-requirements-software
+
+
+BINARY INSTALLATION
+===================
+
+Briefly, to set up the MPV using the binaries-only package:
+
+- unzip everything to a directory
+- edit databaseinfo.def to include the terrain databases you want to view
+- edit system.def
+  - change the default database to the number you chose for the database you 
+    want to view
+  - change host_addr to match your CIGI host's hostname/IP address
+  - change host_port to the UDP port number that your CIGI host will be 
+    listening on
+  - change listen_port to the UDP port number that your CIGI host will be 
+    sending CIGI traffic to
+- (optional) edit the view.def file and change the screen resolution to your 
+  desired resolution 
+- (optional) if you want to see entity models, you need to edit entities.def 
+  to tell MPV where your model files are located
+
+
+CAUTION
+=======
+
+When the MPV starts up, it loads all the files that end in '.def' that it can 
+find.  This means that if you make some changes to, say, system.def and want 
+to create a backup of that file, you MUST NOT name it system-backup.def or 
+anything similar.  If you do this, then BOTH system.def and system-backup.def 
+will be loaded!  Instead, name the backup something that does not end in .def.  
+For example:
+	GOOD: system.def.backup
+	BAD:  system-backup.def
+
+
+USE
+===
+
+If your distribution of MPV came with a script file 'run.sh' or 'runMPV.bat', 
+then you should use it to start the MPV.  If you don't have such a script, 
+then you need to set the following environmental variables before running the 
+MPV:
+  DEF_FILE_PATH - the directory containing the MPV's configuration files
+  LD_LIBRARY_PATH - (Linux only) the directory containing the MPV's 
+    dependencies (such as mpvcommon, cigicl, osg, etc.).  If more than one 
+    directory must be specified, then separate the names with colons (':').
+  LTDL_LIBRARY_PATH - (Linux only) the directory containing the MPV's 
+    plugins (such as libpluginEntityMgr, etc.).  If more than one 
+    directory must be specified, then separate the names with colons (':').
+  PATH - (Windows only) the directory containing the MPV's dependencies AND 
+    plugins.  If more than one directory must be specified, then separate the 
+    names with semicolons (';').
+
+Start the your Host software as you ordinarily would.  If you're using the 
+HE as your Host, then you can start the HE and MPV in any order; other Host 
+software may require that the MPV is started first.
+
+When the MPV starts up, it will wait until it is connected to a CIGI Host 
+before displaying the scene.  While it is waiting, the MPV will display a 
+splash screen.
+
+When you're finished with MPV, you can quit by tapping 'q', tapping 'escape', 
+or by clicking on the close button in the window's title bar.
+
+Keyboard bindings:
+
+q	quit
+w	toggle wireframe/vertices
+t	toggle textures
+l	toggle lighting
+c	toggle mouse-control
+
+A complete summary of the MPV's keyboard shortcuts can be found online, at:
+    http://cigi.wiki.sourceforge.net/mpv-user-keyboard
+
+
+SOURCE CODE
+===========
+
+The binary distribution of the MPV includes libraries produced from 3rd-party 
+software.  As part of the licensing for that software, we are required to 
+tell you, the user, how to obtain the original source code for that software.  
+Listed below are the web sites where the source code can be obtained.
+
+CIGI Class Library (CCL)
+	http://cigi.sourceforge.net
+Open Scene Graph (OSG)
+	http://www.openscenegraph.org
+Simple Directmedia Layer (SDL)
+	http://www.libsdl.org
+Boost
+	http://www.boost.org
+
+
+

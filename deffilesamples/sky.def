@@ -1,0 +1,56 @@
+sky
+{
+	// skydomes will be drawn in the order they are listed here, ie if 
+	// you want one skydome to appear in front of another, you should 
+	// list it first
+	skydome
+	{
+		filename = "/opt/data/sky/skydome.ac";
+		rotate = 0.0, 90.0, 0.0; // yaw pitch roll, in degrees
+	}
+
+	skydome
+	{
+		filename = "/opt/data/sky/haze.ac";
+		rotate = 0.0, 90.0, 0.0; // yaw pitch roll, in degrees
+		// you should set this to true if the skydome model's texture 
+		// has transparent areas
+		transparent = true;
+	}
+}
+
+atmospheric
+{
+	fog_color = 0.96, 0.96, 0.96, 1.0; // rgba for the fog
+
+	// scene features closer to the eyepoint than this distance 
+	// will not be affected by fog
+	fog_start = 10000.0;
+	
+	// the fog will be in full effect at this distance
+	fog_end = 40000.0;
+}
+
+// These values are used by pluginRenderAmbientLightOSG to set the 
+// lighting parameters for the scene.  
+lighting
+{
+	// sun_pos allows you to specify the light direction
+	sun_pos = 1.0, 1.0, 1.0;
+
+	sun_ambient = 0.2, 0.2, 0.2, 1.0;
+	sun_diffuse = 0.8, 0.8, 0.8, 1.0;
+	sun_specular = 0.1, 0.1, 0.1, 1.0;
+	global_ambient = 0.2, 0.2, 0.2, 1.0;
+
+	//OVERCAST NIGHT
+	//sun_ambient = 0.1, 0.1, 0.1, 1.0;
+	//sun_diffuse = 0.0, 0.0, 0.0, 1.0;
+	//sun_specular = 0.1, 0.1, 0.1, 1.0;
+	//global_ambient = 0.0, 0.0, 0.0, 1.0;
+}
+
+ephemeris
+{
+	moon_image = "/opt/data/sky/moon.png";
+}

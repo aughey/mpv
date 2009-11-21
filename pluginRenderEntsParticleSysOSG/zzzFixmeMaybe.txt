@@ -1,0 +1,7 @@
+//fixme - the ParticleSystemUpdater documentation says that we need to add the 
+// ParticleSystemUpdater *after* any emitters and programs, but I'm not sure 
+// we can guarantee that with our node heirarchy...
+
+maybe we could make sure that the "world space" branch off of our entity 
+branch is added first, and that all subsequent additions to the entity branch 
+are made to the beginning of the list in the entity branch

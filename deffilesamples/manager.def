@@ -1,0 +1,35 @@
+manager
+{
+	// specifies an IG connection.  can be listed many times.
+	ig_connection
+	{
+		// The IP address of the IG
+		ig_addr = "130.38.180.136";
+		
+		// The port that the IG will be listening on.
+		ig_port = 8104;
+		
+		// The port that this program should listen on 
+		// (the IG should send messages *TO* this port).
+		listen_port = 8105;
+		
+		// a SOF message will be sent to the Host only when the "master" 
+		// sends one to this application; in this way, the host-bound traffic 
+		// is throttled according to the frame rate of the "master" channel
+		is_master = true;
+	}
+
+	// specifies an IG connection.  can be listed many times.
+	ig_connection
+	{
+		// The IP address of the IG
+		ig_addr = "130.38.180.137";
+		
+		// The port that the IG will be listening on.
+		ig_port = 8204;
+		
+		// The port that this program should listen on 
+		// (the IG should send messages *TO* this port).
+		listen_port = 8205;
+	}
+}

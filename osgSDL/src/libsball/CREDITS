@@ -1,0 +1,13 @@
+
+Libsball development and debugging credits:
+-----------------------------------------
+
+John E. Stone (j.stone@acm.org) 
+  Original author and present maintainer of Libsball.
+
+Bill Sherman (wsherman@ncsa.uiuc.edu)
+  He loaned me a Spaceball the night I wrote this.
+
+All other credits go to the contributors to the original LibOrb 
+project, as this library is based heavily on my LibOrb work.
+

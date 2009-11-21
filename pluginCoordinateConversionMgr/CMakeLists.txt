@@ -1,0 +1,18 @@
+MPV_PLUGIN_INIT(PluginCoordinateConversionMgr)
+
+SET(PluginCoordinateConversionMgr_PRIVATE_HDRS
+	CoordinateConverterProxy.h
+	PluginCoordinateConversionMgr.h
+)
+SET(PluginCoordinateConversionMgr_SRCS
+	CoordinateConverterProxy.cpp
+	PluginCoordinateConversionMgr.cpp
+)
+
+ADD_LIBRARY(PluginCoordinateConversionMgr MODULE
+	${PluginCoordinateConversionMgr_PUBLIC_HDRS}
+	${PluginCoordinateConversionMgr_PRIVATE_HDRS}
+	${PluginCoordinateConversionMgr_SRCS})
+MPV_PLUGIN_PROCESS_TARGET(PluginCoordinateConversionMgr)
+
+TARGET_LINK_LIBRARIES(PluginCoordinateConversionMgr mpvcommon)

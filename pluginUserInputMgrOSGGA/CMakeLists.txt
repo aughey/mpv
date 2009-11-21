@@ -1,0 +1,22 @@
+MPV_PLUGIN_INIT(PluginUserInputMgrOSGGA)
+INCLUDE_DIRECTORIES(${OSG_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(../commonOSG)
+
+SET(PluginUserInputMgrOSGGA_PRIVATE_HDRS
+    PluginUserInputMgrOSGGA.h
+)
+SET(PluginUserInputMgrOSGGA_SRCS
+    PluginUserInputMgrOSGGA.cpp
+)
+
+ADD_LIBRARY(PluginUserInputMgrOSGGA MODULE
+    ${PluginUserInputMgrOSGGA_PUBLIC_HDRS}
+    ${PluginUserInputMgrOSGGA_PRIVATE_HDRS}
+    ${PluginUserInputMgrOSGGA_SRCS})
+MPV_PLUGIN_PROCESS_TARGET(PluginUserInputMgrOSGGA)
+
+TARGET_LINK_LIBRARIES(PluginUserInputMgrOSGGA
+    mpvcommon mpvcommonosg)
+MPV_TARGET_LINK_OSG_LIBRARIES(PluginUserInputMgrOSGGA
+    ${OSGGA_LIBRARY} ${OSG_LIBRARY})
+

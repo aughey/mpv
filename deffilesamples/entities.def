@@ -1,0 +1,1142 @@
+/*
+
+This file allows you to configure your entity types.  
+
+Since CIGI is meant to be used for many types of visualization tasks, there is 
+no standard for the type ID mapping.  The entity types will be different for 
+each project.  Type 100 might be a F-15 on one system, but might be a M1A2 tank 
+on another system, or a race car on yet another system.
+
+The entity types and file names given below match the models found in the 
+MPV content archive (check the Downloads section on the CIGI sourceforge site 
+to get a copy of the content archive).  The models included in that archive 
+are mostly geared toward military flight simulator work (since that's what we 
+do here in our division of Boeing), but you can substitute your own models to 
+create a different model set, appropriate for whatever kind of visualization 
+you work with.
+
+How this file works
+-------------------
+
+The MPV allows you to combine lots of different parts to form an entity's 
+visual representation.  These parts, called "elements", can include:
+  - model files
+  - particle systems
+  - sound effects (!!)
+  - big brightly-colored spheres (mostly for debugging)
+  - text labels
+  - special scene-graph-manipulators
+
+The above list is expected to grow, as new functionality is added.
+
+Some of the above elements have capabilities in addition to simply adding 
+polygons to the entities.  For example, the model file elements can include 
+articulated parts and switchable components.  These can be set up to be 
+controlled by the Host, via articulated part and component control packets.
+
+Special scene-graph-manipulators currently include the near-model manipulator 
+and the entity-scaling manipulator.
+
+One important concept regarding entity elements is that they can be nested.
+For example, if you want to set up a cockpit mask for your ownship, you'd 
+add a near_model element to your entity type, and inside that near_model 
+section you'd add a model_file element.  The model_file element would be 
+placed under the near_model element in the scene graph, and would be affected 
+by it when rendered.  
+
+FIXME - provide more examples of nesting entity elements.
+
+*/
+
+entities
+{
+
+/*
+The special type_id "default" indicates that this entity section should be 
+used whenever the Host specifies an entity type ID that the MPV doesn't 
+recognize.  I use a flying saucer model for this.  Acceptable alternatives 
+include moo cows and aircraft carriers.
+
+Note that the CIGI standard states that any entity type ID not recognized 
+by the IG should be ignored.  The MPV's default-model feature violates this 
+rule.  Use with care.
+*/
+entity
+{
+	name = "Default model";
+	type_id = default;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/andrews/flyingSaucer/flyingSaucer-0c.ac.90,0,0.rot";
+	}
+}
+
+
+entity
+{
+	name = "f18c";
+	type_id = 118;
+	
+	// This is an example of a model file element, with some switchable 
+	// components
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/Delta3D_Asset_Library/vehicles/air/f18c_hornet_navy/1103021162_f18c_hornet_navy.flt";
+
+		built_in_switch
+		{
+			component_id = 0;
+			// the MPV will search for a node matching this name when setting up this element
+			node_name = "PositionLights";
+			default_cigi_value = 0;
+
+			state
+			{
+				cigi_value = 0;
+				switch_value = 0;
+			}
+
+			state
+			{
+				cigi_value = 1;
+				switch_value = 1;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 1;
+			// the MPV will search for a node matching this name when setting up this element
+			node_name = "AntiCollisionLights";
+			default_cigi_value = 0;
+
+			state
+			{
+				cigi_value = 0;
+				switch_value = 0;
+			}
+
+			state
+			{
+				cigi_value = 1;
+				switch_value = 1;
+			}
+		}
+	}
+
+
+	/*
+	Here is an example of a high-visibility sphere element.  We use these for 
+	debugging, as they are visible at great distances.  We also turn them on 
+	for demos, so that people can figure out what's going on.  
+
+	They're also useful if you're not a very good virtual pilot (like me), as 
+	they make it easier to see other aircraft.  This has earned these 
+	indicators the nickname "rookie dots".
+	*/
+	element
+	{
+		element_type = high_vis_sphere;
+		color = 0.0, 0.0, 1.0; // R, G, B
+	}
+
+
+	// Here's an example of a text label element.
+	element
+	{
+		element_type = label;
+		
+		default_text = "F-18";
+		color = 1.0, 1.0, 1.0; // R, G, B
+		size = 2.0; // text height, meters
+		offset = 0.0, 0.0, 0.0; // right, forward, up, in meters
+		
+		// If you specify a component ID, the Host can set the text using a 
+		// component control.  It's optional.
+		component_id = 4321;
+	}
+	
+}
+
+
+// Note - This entity type describes a model that is not included in the MPV 
+// content archive.  It is listed here for illustrative purposes, to show 
+// how to set up articulated parts, and advanced component control techniques.
+entity
+{
+	name = "F-15";
+	type_id = 9999;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/boeingTSSDBG/f15generic/f15_strike-eagle_gear.flt";
+		
+		/*
+		Note - you can set up multiple "built_in_switch"es with the 
+		same component_id.  This could allow you to turn on and off multiple 
+		switches using a single component control.  This feature could also 
+		allow you to set up a sort of mutex, where some switches are turned off 
+		and others turned on just by setting a single component control.
+		
+		Here, I've done exactly that.  When the Host sets this entity's 
+		component control 1 to 0, both the full-speed-brake and 
+		half-speed-brake switches are turned off.  When the component is 
+		set to 1, the full-speed-brake is turned off and the half-speed-brake 
+		is turned on.  When the component is set to 2, the full-speed-brake is 
+		turned on and the half-speed-brake is turned off.  
+		
+		This feature affords a great deal of flexibility, especially when 
+		working with poorly written Host software that doesn't permit 
+		sufficient configurability.
+		*/
+		built_in_switch
+		{
+			component_id = 1;
+			node_name = "BrakePSW";
+			default_cigi_value = 0;
+			
+			state
+			{
+				cigi_value = 0;
+				// pbOFF
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 1;
+				// pbON
+				switch_value = 1;
+			}
+			
+			state
+			{
+				cigi_value = 2;
+				// pbOFF
+				switch_value = 0;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 1;
+			node_name = "BrakeFSW";
+			default_cigi_value = 0;
+			
+			state
+			{
+				cigi_value = 0;
+				// fbOFF
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 1;
+				// fbOFF
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 2;
+				// fbON
+				switch_value = 1;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 2;
+			node_name = "LantirnsSW";
+			default_cigi_value = 0;
+			
+			state
+			{
+				cigi_value = 0;
+				// LantOFF
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 1;
+				// LantON
+				switch_value = 1;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 3;
+			node_name = "WingsdamageSW";
+			default_cigi_value = 0;
+			
+			state
+			{
+				cigi_value = 0;
+				// wGOOD
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 1;
+				// wDMG
+				switch_value = 1;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 4;
+			// conformal tanks
+			node_name = "CftSW";
+			default_cigi_value = 1;
+			
+			state
+			{
+				cigi_value = 1;
+				// cftON
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 0;
+				// cftOFF
+				switch_value = 1;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 5;
+			node_name = "DoorSW";
+			default_cigi_value = 0;
+			
+			state
+			{
+				cigi_value = 0;
+				// DrOff
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 1;
+				// DrDyna
+				switch_value = 1;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 5;
+			node_name = "GearSW";
+			default_cigi_value = 0;
+			
+			state
+			{
+				cigi_value = 0;
+				// GearOff
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 1;
+				// GearDyna
+				switch_value = 1;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 6;
+			node_name = "TaxiSW";
+			default_cigi_value = 0;
+			
+			state
+			{
+				cigi_value = 0;
+				// taxiOFF
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 1;
+				// taxiON
+				switch_value = 1;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 7;
+			node_name = "Afterburner_SW";
+			default_cigi_value = 0;
+			
+			state
+			{
+				cigi_value = 0;
+				// abOFF
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 1;
+				// abON
+				switch_value = 1;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 8;
+			node_name = "PositionSW";
+			default_cigi_value = 0;
+			
+			state
+			{
+				cigi_value = 0;
+				// psnOFF
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 1;
+				// psnON
+				switch_value = 1;
+			}
+		}
+
+		built_in_switch
+		{
+			component_id = 9;
+			node_name = "CollisionSW";
+			default_cigi_value = 0;
+			
+			state
+			{
+				cigi_value = 0;
+				// colOFF
+				switch_value = 0;
+			}
+			
+			state
+			{
+				cigi_value = 1;
+				// clON
+				switch_value = 1;
+			}
+		}
+
+		// Like switchable components, articulated parts can also have 
+		// multiple nodes bound to the same ID.  Here, I've set up some of 
+		// the landing gear doors to operate in unison, using a single 
+		// articulated part ID.
+		built_in_articulated_part
+		{
+			art_part_id = 1;
+			node_name = "NDoorF";
+		}
+		built_in_articulated_part
+		{
+			art_part_id = 1;
+			node_name = "NDoorA";
+		}
+
+		// Like switchable components, articulated parts can also have 
+		// multiple nodes bound to the same ID.  Here, I've set up some of 
+		// the landing gear doors to operate in unison, using a single 
+		// articulated part ID.
+		built_in_articulated_part
+		{
+			art_part_id = 2;
+			node_name = "LMDoorFR";
+		}
+		built_in_articulated_part
+		{
+			art_part_id = 2;
+			node_name = "LMDoorFL";
+		}
+		built_in_articulated_part
+		{
+			art_part_id = 2;
+			node_name = "LMDoorA";
+		}
+
+		// Like switchable components, articulated parts can also have 
+		// multiple nodes bound to the same ID.  Here, I've set up some of 
+		// the landing gear doors to operate in unison, using a single 
+		// articulated part ID.
+		built_in_articulated_part
+		{
+			art_part_id = 3;
+			node_name = "RMDoorFR";
+		}
+		built_in_articulated_part
+		{
+			art_part_id = 3;
+			node_name = "RMDoorFL";
+		}
+		built_in_articulated_part
+		{
+			art_part_id = 3;
+			node_name = "RMDoorA";
+		}
+
+		built_in_articulated_part
+		{
+			art_part_id = 4;
+			node_name = "NGear";
+		}
+
+		built_in_articulated_part
+		{
+			art_part_id = 5;
+			node_name = "LMGear";
+		}
+
+		built_in_articulated_part
+		{
+			art_part_id = 6;
+			node_name = "RMGear";
+		}
+
+		built_in_articulated_part
+		{
+			art_part_id = 7;
+			node_name = "Flap-L";
+		}
+
+		built_in_articulated_part
+		{
+			art_part_id = 8;
+			node_name = "Flap-R";
+		}
+
+		built_in_articulated_part
+		{
+			art_part_id = 9;
+			node_name = "Ail-L";
+		}
+
+		built_in_articulated_part
+		{
+			art_part_id = 10;
+			node_name = "Ail-R";
+		}
+
+		built_in_articulated_part
+		{
+			art_part_id = 11;
+			node_name = "Stabs";
+		}
+
+		built_in_articulated_part
+		{
+			art_part_id = 12;
+			node_name = "Rud-L";
+		}
+
+		built_in_articulated_part
+		{
+			art_part_id = 13;
+			node_name = "Rud-R";
+		}
+
+	}
+
+}
+
+
+entity
+{
+	name = "f22a";
+	type_id = 122;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/CSP/f22m04.3ds";
+	}
+}
+
+
+entity
+{
+	name = "sr71";
+	type_id = 171;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/3dcafe/sr71blackbird/sr71.ive";
+	}
+}
+
+
+entity
+{
+	name = "su34";
+	type_id = 234;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/3dkingdom.org/SU-34/su-34-0e.ac.0,90,0.rot";
+	}
+}
+
+
+entity
+{
+	name = "uh-1n";
+	type_id = 301;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/Delta3D_Asset_Library/vehicles/air/uh-1n/uh-1n.flt";
+	}
+}
+
+
+entity
+{
+	name = "mv22_osprey";
+	type_id = 322;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/Delta3D_Asset_Library/vehicles/air/mv22/mv22.flt";
+	}
+}
+
+
+entity
+{
+	name = "ah64_apache";
+	type_id = 364;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/turbosquid/Apache/apache-0c.ac.0,90,0.rot";
+	}
+}
+
+
+entity
+{
+	name = "mi24_hind_ru";
+	type_id = 424;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/Delta3D_Asset_Library/vehicles/air/mi24_hind_ru/1113026126_mi24_hind_ru.flt";
+	}
+}
+
+
+entity
+{
+	name = "BRDM";
+	type_id = 501;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/Delta3D_Asset_Library/vehicles/land/brdm/brdm.flt";
+	}
+}
+
+
+entity
+{
+	name = "m1126_stryker_us";
+	type_id = 526;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/Delta3D_Asset_Library/vehicles/land/m1126_stryker_us/1208002174_m1126_stryker_od.flt";
+	}
+}
+
+
+entity
+{
+	name = "t72m1_od";
+	type_id = 672;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/Delta3D_Asset_Library/vehicles/land/t72m1_od/1217212126_t72m1_od.flt";
+	}
+}
+
+
+entity
+{
+	name = "aim9";
+	type_id = 909;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/boeing/AIM-9/aim9-0c.ac.0,90,0.rot";
+	}
+}
+
+
+entity
+{
+	name = "aim120";
+	type_id = 920;
+	
+	element
+	{
+		element_type = model_file;
+		filename = "/opt/data/models/boeing/AIM-120/aim120-0d.ac.0,90,0.rot";
+	}
+}
+
+
+/*
+A note on the animations: Many of the explosion special effects 
+are disabled.  This is because some of the artwork, specifically 
+the fireball animation images, could not be given away.
+While this does diminish some of the visual impact of some of the 
+explosions, I think that you'll find that the remaining special 
+effects are convincing enough.  
+
+Remember, you can always tweak these animations, or create new 
+ones!  Take a look at partsys.def.
+*/
+
+
+/*
+entity
+{
+	name = "debug anim";
+	type_id = 1002;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "debug anim";
+	}
+}
+*/
+
+entity
+{
+	name = "ground explosion with debris";
+	type_id = 1003;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "scattered debris 1";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "dirt plume 1";
+	}
+}
+
+entity
+{
+	name = "tracers";
+	type_id = 1008;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "tracers";
+	}
+}
+
+entity
+{
+	name = "chaff 1";
+	type_id = 1009;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "chaff 1";
+	}
+}
+
+entity
+{
+	name = "ground explosion with dust plumes and smoke";
+	type_id = 1010;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "launch ring";
+	}
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "groundFireball1 x4";
+//	}
+	element
+	{
+		element_type = particle_system;
+		name = "dust tendril";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "dust patter";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "ground fire smoke";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "dust cloud";
+	}
+}
+
+/*
+entity
+{
+	name = "groundFireball_long1";
+	type_id = 1011;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "launch ring";
+	}
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "groundFireball_long1";
+//	}
+	element
+	{
+		element_type = particle_system;
+		name = "dust tendril";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "dust patter";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "ground fire smoke";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "dust cloud";
+	}
+}
+*/
+
+entity
+{
+	name = "ground explosion with dust puffs";
+	type_id = 1012;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "launch ring";
+	}
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "groundFireball_wTrails1";
+//	}
+	element
+	{
+		element_type = particle_system;
+		name = "dust patter";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "ground fire smoke";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "dust cloud";
+	}
+}
+
+entity
+{
+	name = "anti-personnel";
+	type_id = 1013;
+	
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "airSmokePuff1 offset +z";
+//	}
+	element
+	{
+		element_type = particle_system;
+		name = "shrapnel";
+	}
+}
+
+entity
+{
+	// huge detonation; mostly dust
+	name = "huge ground explosion";
+	type_id = 1014;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "big expl cloud";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "big expl ring";
+	}
+}
+
+entity
+{
+	name = "air explosion with burning debris";
+	type_id = 1020;
+	
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "airExplosion1";
+//	}
+	element
+	{
+		element_type = particle_system;
+		name = "air expl puffs";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "burning aircraft debris";
+	}
+}
+
+entity
+{
+	name = "air explosion, no debris";
+	type_id = 1021;
+	
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "airExplosion_wTrails1";
+//	}
+	element
+	{
+		element_type = particle_system;
+		name = "air expl puffs";
+	}
+}
+
+/*
+entity
+{
+	name = "airExplosion_wTrails2";
+	type_id = 1022;
+	
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "airExplosion_wTrails2";
+//	}
+	element
+	{
+		element_type = particle_system;
+		name = "air expl puffs";
+	}
+}
+
+entity
+{
+	name = "airExplosion_wTrails3";
+	type_id = 1023;
+	
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "airExplosion_wTrails3";
+//	}
+	element
+	{
+		element_type = particle_system;
+		name = "air expl puffs";
+	}
+}
+
+entity
+{
+	name = "airExplosion_wTrails4";
+	type_id = 1024;
+	
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "airExplosion_wTrails4";
+//	}
+	element
+	{
+		element_type = particle_system;
+		name = "air expl puffs";
+	}
+}
+
+entity
+{
+	name = "blast1";
+	type_id = 1025;
+	
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "blast1";
+//	}
+	element
+	{
+		element_type = particle_system;
+		name = "air expl puffs";
+	}
+}
+*/
+
+entity
+{
+	name = "SAM missile launch";
+	type_id = 1030;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "launch ring";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "launch puffs";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "launch stream";
+	}
+}
+
+entity
+{
+	name = "missile launch";
+	type_id = 1031;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "launch stream";
+	}
+}
+
+entity
+{
+	name = "wingtip contrail thin";
+	type_id = 1040;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "wingtip contrail thin";
+	}
+}
+
+entity
+{
+	name = "missile trail thick";
+	type_id = 1041;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "missile trail thick";
+	}
+	element
+	{
+		element_type = particle_system;
+		name = "wingtip contrail glline";
+	}
+}
+
+entity
+{
+	name = "aircraft generic dark trail";
+	type_id = 1042;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "aircraft generic dark trail";
+	}
+}
+
+/*
+entity
+{
+	name = "airSmokePuff2";
+	type_id = 1050;
+	
+//	element
+//	{
+//		element_type = particle_system;
+//		name = "airSmokePuff2";
+//	}
+}
+*/
+
+/*
+entity
+{
+	name = "debug fountain";
+	type_id = 1051;
+	
+	element
+	{
+		element_type = particle_system;
+		name = "debug fountain";
+	}
+}
+*/
+
+
+}

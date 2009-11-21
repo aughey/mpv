@@ -1,0 +1,14 @@
+#ifndef OSGSDL_EXPORT_
+#define OSGSDL_EXPORT_ 1
+
+#ifdef WIN32
+#	ifdef OSGSDL_LIBRARY
+#		define OSGSDL_EXPORT	__declspec(dllexport)
+#	else
+#		define OSGSDL_EXPORT	__declspec(dllimport)
+#	endif
+#else
+#	define OSGSDL_EXPORT
+#endif
+
+#endif

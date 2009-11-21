@@ -1,0 +1,22 @@
+*****************************************************************************
+* THIS LIBRARY HAS BEEN MODIFIED (see source code comments). THE FOLLOWING  *
+* TEXT REFERS TO THE ORIGINAL VERSION.                                      *
+*                                                                           *
+*                                                 Marco Jez, 9/7/2002       *
+*****************************************************************************
+
+History of revision changes:
+----------------------------
+
+Version 1.0 - Minor tweak to the initialization code that makes the
+              Spaceball 4000 FLX happier.  Lots of documentation updates.
+
+Version 0.5 - First support for Spaceball 3000, 3003, and 4000 FLX models
+              The code passively auto-detects what model device it is by 
+              the types of packets it receives.
+
+Version 0.1 - First public release of Libsball. (01/23/99)
+              Based heavily on LibOrb, with various improvements that
+              are spaceball specific.  Only supported Spaceball 2003.
+ 
+

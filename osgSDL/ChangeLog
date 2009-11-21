@@ -1,0 +1,21 @@
+2005-10-02
+This release includes:
+- Ported to OSG 0.9.9
+- Fixed some compiler warnings
+
+
+2004-09-12
+This release includes:
+- Linux build files
+- runOnce(), which allows you to use your own main loop instead of 
+  osgSDL's run()
+- a change to how input events are handled.  All queued SDL events are 
+  processed every time runOnce() is called.  This prevents events from 
+  backlogging, which in turn prevents the mouse input events from "lagging 
+  behind" and creating the appearance of a sluggish interface.
+- Spaceball support is now optional.  I'm still working on making this a 
+  compile-time option which can be set when you run the configure script.
+
+
+2004-09-01
+- initial release to sourceforge.  Included the original source only.

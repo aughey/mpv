@@ -1,0 +1,40 @@
+#ifndef OSGSDL_CURSOR_
+#define OSGSDL_CURSOR_ 1
+
+#include <osgSDL/Export>
+
+#include <osg/Referenced>
+
+#include <SDL.h>
+
+namespace osgSDL
+{
+
+	class OSGSDL_EXPORT Cursor: public osg::Referenced {
+	public:
+		Cursor();
+		
+		inline void setSDLCursor(SDL_Cursor *c)        { sdl_cursor_ = c;    }
+		inline SDL_Cursor *getSDLCursor()              { return sdl_cursor_; }
+		inline const SDL_Cursor *getSDLCursor() const  { return sdl_cursor_; }
+		
+	protected:
+		virtual ~Cursor();
+		Cursor &operator=(const Cursor &) { return *this; }
+		
+	private:
+		SDL_Cursor *sdl_cursor_;
+	};
+	
+	class OSGSDL_EXPORT WaitCursor: public Cursor {
+	public:
+		WaitCursor();
+		
+	protected:
+		virtual ~WaitCursor() {}
+		WaitCursor &operator=(const WaitCursor &) { return *this; }
+	};
+
+}
+
+#endif

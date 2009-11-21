@@ -1,0 +1,19 @@
+The Multi-Purpose Viewer is licensed under the GNU General Public License 
+(GPL).  See the COPYING file for a copy of that license.
+
+In short, you can use this software as you see fit, provided that:
+
+- you do not charge anyone for this software
+- you do not claim that you wrote this software
+- if you make changes to this software, you MUST release the source code for 
+  those changes to ANYONE who receives a copy of the modified software.  If 
+  you release your modified version to one of your customers, then you must 
+  also release the source code for the modifications to that customer.  If 
+  you release your modified version publicly, then you must also release the 
+  source code for the modifications publicly.
+
+We are currently (circa 2007) in the process of changing the licensing to 
+allow vendors to create commercial plugins.  The license for various plugins 
+has been changed from the GPL to the less-restrictive LGPL.  However, the 
+majority of the MPV's components, including the common lib, are still licensed 
+under the GPL.

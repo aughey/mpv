@@ -1,0 +1,73 @@
+osgSDL is a simple library that can be used to create an OpenGL rendering
+context for use with applications based on the Open Scene Graph library. It is 
+also used to handle input events, such as key presses, mouse clicks, etc. This 
+library uses SDL  to create the rendering context and handle input events. 
+This library is useful as an alternative to using GLUT or Producer, and is 
+mainly of interest to Open Scene Graph application developers.
+
+web page:  http://osgsdl.sourceforge.net
+
+To compile this library, you'll need:
+SDL - www.libsdl.org
+OSG - www.openscenegraph.org
+
+Compilation instructions (Windows):
+==================================
+The project files are for VC6, but I don't think OSG works with anything older 
+than VC7.  Compilation should be no different from compiling any other VC 
+project.  
+
+
+Compilation instructions (Linux):
+==================================
+- Make sure you have SDL and OSG installed
+- Run "./configure" and "make"
+- As root, run "make install" and "ldconfig"
+
+Usage (Linux):
+==============
+When compiling a program that uses osgSDL, you don't have to figure out 
+which -L and -I and -l options to use.  You can have the "pkg-config" program 
+figure this out for you.  To get a list of -I options, run: 
+"pkg-config --cflags osgSDL"
+
+To get a list of -L and -l options, run: 
+"pkg-config --libs osgSDL"
+
+You can run pkg-config directly from your "make" scripts if you use the 
+backtick notation (this character: `).
+
+Note: If you installed osgSDL in /usr/local (the default) you may need to do 
+some extra work to get pkg-config to work with libraries in /usr/local.  You'll 
+need to add "/usr/local/lib/pkgconfig/" to your $PKG_CONFIG_PATH environmental 
+variable.  
+
+If you have "library not found" problems when running programs linked against 
+osgSDL, make sure that /usr/local/lib is listed in your /etc/ld.so.conf file.
+
+
+History:
+========
+osgSDL was written by Marco Jez. Marco doesn't maintain osgSDL any more, so 
+I asked him if it was OK to take over maintenance for the library. He agreed, 
+so here it is.  The original web page for osgSDL was: 
+http://web.tiscali.it/areavr/osg/
+
+Changes from the original version include:
+- Linux build files are now included.  This library originally included 
+  Visual Studio build files only.  
+- Spaceball support is now optional.  I'm still working on making this a 
+  compile-time option which can be set when you run the configure script.
+- osgSDL can now be used without using the provided "main loop".  If your 
+  program has its own main loop, just call osgSDL's runOnce() instead of 
+  run().  The runOnce() function will process input events, render the 
+  scene, and return (instead of running forever).  The run() function behaves 
+  just like it always has.
+
+
+Future Plans:
+=============
+- I'd like to put together an example program that makes use of osgSDL, to 
+  get people started quickly.
+- I'd like to document osgSDL a bit.
+

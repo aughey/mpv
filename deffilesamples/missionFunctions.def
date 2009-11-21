@@ -1,0 +1,72 @@
+// This file controls some preferences for the new mission functions plugin.
+
+mission_functions
+{
+    // ignore_back_face
+    //
+    // If true, back facing polygons are excluded from LOS returns.
+    // NOTE: You probably are always going to want this off.
+    //
+    // Defaults: 0
+    // 
+    //ignore_back_face = 0;
+    
+    // enable_vis_lase
+    //
+    // Enable / Disable visual lase line
+    //
+    // Defaults: 1
+    //
+    //enable_vis_lase = 1;
+
+    // ownship_entity_id
+    //
+    // If enable_vis_lase is true when a LOS request intersects this entity ID
+    // the color of the line will be red.  It is meant to illustrate when the Ownship lases itself.
+    //
+    // Defaults: 0
+    //
+    //ownship_entity_id = 0;
+
+    // lase_timeout_frames
+    //
+    // If enable_vis_line is true this value denotes the maximum number of frames that a lase line is
+    // to remain visible in the scene.  Using 0 here keeps the lase line active forever (unless the line is 
+    // removed because of max_lase_lines).
+    //
+    // Defaults: 60
+    //
+    //lase_timeout_frames = 60;
+
+    // max_lase_lines
+    //
+    // If enable_vis_line is true this value denotes the maximum number of lase lines to display in the scene
+    // at any given time.  Typically 1 is used here which causes a new lase to immediately erase the previous.
+    // Using 0 here implies no limit on lase lines.
+    //
+    // Defaults: 1
+    //
+    //max_lase_lines = 1;
+
+	// override_entity_material
+	// 
+	// Allows you to specify the material code that should be returned for 
+	// LOS extended responses if the LOS hits an entity.  This is useful, 
+	// because:
+	// - most models are not material classified (hence the material codes are 
+	//   not available)
+	// - the OSG-based LOS handler doesn't set material codes (OSG does not 
+	//   make such information available)
+	override_entity_material = 20;
+
+	// override_terrain_material
+	// 
+	// Allows you to specify the material code that should be returned for 
+	// HAT/HOT extended responses (and LOS ext. responses if the LOS hits 
+	// the terrain).  This is useful, because:
+	// - most terrain databases are not material classified (hence the 
+	//   material codes are not available)
+	// - the OSG-based HOT and LOS handlers don't set material codes (OSG 
+	//   does not make such information available)
+	override_terrain_material = 28;
+}

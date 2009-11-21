@@ -1,0 +1,21 @@
+MPV_PLUGIN_INIT(PluginRenderOSG)
+INCLUDE_DIRECTORIES(${OSG_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(../commonOSG)
+
+SET(PluginRenderOSG_PRIVATE_HDRS
+    PluginRenderOSG.h
+)
+SET(PluginRenderOSG_SRCS
+    PluginRenderOSG.cpp
+)
+
+ADD_LIBRARY(PluginRenderOSG MODULE
+    ${PluginRenderOSG_PUBLIC_HDRS}
+    ${PluginRenderOSG_PRIVATE_HDRS}
+    ${PluginRenderOSG_SRCS})
+MPV_PLUGIN_PROCESS_TARGET(PluginRenderOSG)
+
+TARGET_LINK_LIBRARIES(PluginRenderOSG
+    mpvcommon)
+MPV_TARGET_LINK_OSG_LIBRARIES(PluginRenderOSG
+    ${OSG_LIBRARY})

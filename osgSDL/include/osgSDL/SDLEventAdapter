@@ -1,0 +1,243 @@
+#ifndef OSGSDL_SDLEVENTADAPTER_
+#define OSGSDL_SDLEVENTADAPTER_ 1
+
+#include <osgGA/GUIEventAdapter>
+#include <osg/Version>
+
+#include <stdlib.h>
+
+#include <SDL.h>
+
+namespace osgSDL
+{
+
+	enum SDLUserEvent {
+		USER_SPACEBALL_EVENT,
+		USER_FRAME_EVENT,
+		USER_UPDATE_EVENT,
+		USER_INIT_EVENT
+	};
+
+	class SDLEventAdapter: public osgGA::GUIEventAdapter {
+	public:
+		inline SDLEventAdapter(const SDL_Event &event, int x1, int y1, int x2, int y2, double t, int btnstate_);
+
+		inline const SDL_Event &getSDLEvent() const;
+
+		inline virtual EventType getEventType() const;
+		inline int getUserEventID() const;
+		inline void *getUserEventData() const;
+		inline void *getUserEventData2() const;
+		inline virtual int getKey() const;
+
+	protected:
+		virtual ~SDLEventAdapter() {}
+		SDLEventAdapter &operator=(const SDLEventAdapter &) { return *this; }
+
+	private:
+		SDL_Event event_;
+	};
+
+	// INLINE FUNCTIONS
+
+	inline SDLEventAdapter::SDLEventAdapter(const SDL_Event &event, int x1, int y1, int x2, int y2, double t, int btnstate)
+		:	event_(event)
+	{
+		setTime(t);
+		setInputRange( x1, y1, x2, y2 );
+
+		// Set the button mask based on the buttons pressed
+		unsigned int mask = 0;
+		if (btnstate & SDL_BUTTON(1)) mask |= LEFT_MOUSE_BUTTON;
+		if (btnstate & SDL_BUTTON(2)) mask |= MIDDLE_MOUSE_BUTTON;
+		if (btnstate & SDL_BUTTON(3)) mask |= RIGHT_MOUSE_BUTTON;  
+		setButtonMask(mask);
+
+		// Set the button pressed based on the buttons pressed
+		int button_pressed = 0;
+		if (event_.type == SDL_MOUSEBUTTONDOWN || event_.type == SDL_MOUSEBUTTONUP) {
+			switch (event_.button.button) {
+				case SDL_BUTTON_LEFT:
+					button_pressed = LEFT_MOUSE_BUTTON;
+					break;
+				case SDL_BUTTON_MIDDLE:
+					button_pressed = MIDDLE_MOUSE_BUTTON;
+					break;
+				case SDL_BUTTON_RIGHT:
+					button_pressed = RIGHT_MOUSE_BUTTON;
+					break;
+				default: ;
+			}
+			setButton(button_pressed);
+		}
+		else
+		{
+			setButton(-1);
+		}
+
+		// Set X & Y
+		switch (event_.type) {
+			case SDL_MOUSEMOTION:
+				setX(event_.motion.x);
+				setY(event_.motion.y);
+				break;
+
+			case SDL_MOUSEBUTTONDOWN:
+			case SDL_MOUSEBUTTONUP:
+				setX(event_.button.x);
+				setY(event_.button.y);
+				break;
+
+			default:
+				setX(0);
+				setY(0);
+				break;
+		};
+	}
+
+	inline const SDL_Event &SDLEventAdapter::getSDLEvent() const
+	{
+		return event_;
+	}
+
+	inline SDLEventAdapter::EventType SDLEventAdapter::getEventType() const
+	{
+		switch (event_.type) {
+
+			case SDL_USEREVENT:
+				if (event_.user.code == USER_FRAME_EVENT)
+					return FRAME;
+				return static_cast<EventType>(0xffff);
+
+			case SDL_KEYDOWN:
+				return KEYDOWN;
+				
+			case SDL_KEYUP:
+				return KEYUP;
+
+			case SDL_MOUSEMOTION:
+				if (getButtonMask() == 0)
+					return MOVE;
+				else
+					return DRAG;
+
+			case SDL_MOUSEBUTTONDOWN:
+				return PUSH;
+
+			case SDL_MOUSEBUTTONUP:
+				return RELEASE;
+
+			case SDL_VIDEORESIZE:
+				return RESIZE;
+
+			default: ;
+		}
+		return NONE;
+	}
+	
+	inline int SDLEventAdapter::getUserEventID() const
+	{
+		if (event_.type == SDL_USEREVENT) {
+			return event_.user.code;
+		}
+		return -1;
+	}
+	
+	inline void *SDLEventAdapter::getUserEventData() const
+	{
+		if (event_.type == SDL_USEREVENT) {
+			return event_.user.data1;
+		}
+		return 0;
+	}
+
+	inline void *SDLEventAdapter::getUserEventData2() const
+	{
+		if (event_.type == SDL_USEREVENT) {
+			return event_.user.data2;
+		}
+		return 0;
+	}
+
+	inline int SDLEventAdapter::getKey() const
+	{
+		if (event_.type == SDL_KEYDOWN) {
+			// this bit of code supports a minimal set of mappings 
+			// for "special" keys, such as Esc, the F-keys, etc.
+			switch( event_.key.keysym.sym )
+			{
+			case SDLK_BACKSPACE:
+				return osgGA::GUIEventAdapter::KEY_BackSpace;
+			case SDLK_TAB:
+				return osgGA::GUIEventAdapter::KEY_Tab;
+			case SDLK_RETURN:
+				return osgGA::GUIEventAdapter::KEY_Return;
+			case SDLK_PAUSE:
+				return osgGA::GUIEventAdapter::KEY_Pause;
+			case SDLK_ESCAPE:
+				return osgGA::GUIEventAdapter::KEY_Escape;
+			case SDLK_SPACE:
+				return osgGA::GUIEventAdapter::KEY_Space;
+			case SDLK_DELETE:
+				return osgGA::GUIEventAdapter::KEY_Delete;
+			case SDLK_UP:
+				return osgGA::GUIEventAdapter::KEY_Up;
+			case SDLK_DOWN:
+				return osgGA::GUIEventAdapter::KEY_Down;
+			case SDLK_RIGHT:
+				return osgGA::GUIEventAdapter::KEY_Right;
+			case SDLK_LEFT:
+				return osgGA::GUIEventAdapter::KEY_Left;
+			case SDLK_INSERT:
+				return osgGA::GUIEventAdapter::KEY_Insert;
+			case SDLK_HOME:
+				return osgGA::GUIEventAdapter::KEY_Home;
+			case SDLK_END:
+				return osgGA::GUIEventAdapter::KEY_End;
+			case SDLK_PAGEUP:
+				return osgGA::GUIEventAdapter::KEY_Page_Up;
+			case SDLK_PAGEDOWN:
+				return osgGA::GUIEventAdapter::KEY_Page_Down;
+			case SDLK_F1:
+				return osgGA::GUIEventAdapter::KEY_F1;
+			case SDLK_F2:
+				return osgGA::GUIEventAdapter::KEY_F2;
+			case SDLK_F3:
+				return osgGA::GUIEventAdapter::KEY_F3;
+			case SDLK_F4:
+				return osgGA::GUIEventAdapter::KEY_F4;
+			case SDLK_F5:
+				return osgGA::GUIEventAdapter::KEY_F5;
+			case SDLK_F6:
+				return osgGA::GUIEventAdapter::KEY_F6;
+			case SDLK_F7:
+				return osgGA::GUIEventAdapter::KEY_F7;
+			case SDLK_F8:
+				return osgGA::GUIEventAdapter::KEY_F8;
+			case SDLK_F9:
+				return osgGA::GUIEventAdapter::KEY_F9;
+			case SDLK_F10:
+				return osgGA::GUIEventAdapter::KEY_F10;
+			case SDLK_F11:
+				return osgGA::GUIEventAdapter::KEY_F11;
+			case SDLK_F12:
+				return osgGA::GUIEventAdapter::KEY_F12;
+			case SDLK_F13:
+				return osgGA::GUIEventAdapter::KEY_F13;
+			case SDLK_F14:
+				return osgGA::GUIEventAdapter::KEY_F14;
+			case SDLK_F15:
+				return osgGA::GUIEventAdapter::KEY_F15;
+//			case :
+//				return osgGA::GUIEventAdapter::;
+			default:
+				return static_cast<int>(event_.key.keysym.unicode);
+			}
+		}
+		return -1;
+	}
+	
+}
+
+#endif
+

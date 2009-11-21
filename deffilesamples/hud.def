@@ -1,0 +1,38 @@
+Simple_HUD
+{
+	// [TYPE] Simple or FA18
+	type=FA18;
+
+	// [POSITION]
+	left_x = 416;
+	width_x=448;
+	bottom_y=1;
+	height_y=358;
+	depression=0.0;
+	HUDUnderEye = 14; // 28 and 40 for a bigger view
+	HUDTotal = 20; // field of view of hud
+
+	// [DEFAULT]
+	latitude=32.0;
+	longitude=-118.0;
+	airspeed=220.0;
+	altitude=2000.0;
+	heading=0.0;
+	pitch=0.0;
+	roll=0.0;
+	aoa=0.0;
+	gforce=1.0;
+	mr=1.0;
+
+	// [COMMUNICATION]
+	// simpleHudPort=8006;
+	simpleHudPort=8116;
+	fa18HudPort=5000;
+
+	// [ RMICS Options ]
+	// PVI_HOME and RUN_HOME can also be environment variables
+	// it is important that there is a trailing slash for each
+	PVI_HOME="/opt/RMICS/base/";
+	RUN_HOME="/opt/RMICS/base/run/";
+	RMICS_HudPort=9000;
+}

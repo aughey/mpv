@@ -1,0 +1,534 @@
+Version 2.1.0
+-------------
+[2009-01-07]
+
+- Rewrote several key subsystems in the MPV, including:
+    - Entities, articulations, component controls
+    - Coordinate conversion
+    - Terrain databases
+    - Mission functions processing
+
+- Boost is now a mandatory requirement of the MPV.  The XLObject code 
+  has been removed.
+
+- Removed the Visual Studio project files and the autoconf/automake build 
+  files, as they are no longer maintained.  This completes the transition 
+  to CMake as the sole build system for the MPV.  Many thanks go to P. Lowman 
+  for making this possible.
+
+- Implemented more of the CIGI Symbology interface.  All symbol geometry 
+  types are implemented (including all variants of circles).  Fonts can 
+  be specified for text symbols.  Entity-attached symbol surfaces are 
+  partially implemented.  Also implemented is symbol cloning, symbol 
+  redefinition, and symbol surface redefinition.  Symbology features that 
+  remain to be implemented include line stipple/width, billboarded symbol 
+  surfaces, and IG-defined symbols.
+
+- Many of the MPV's components have been relicensed under the LGPL, as part 
+  of the rewrite effort.
+
+This release of the MPV is the result of a significant rewrite, and as such 
+many things have changed.  There has been some regressions; the most notable 
+features that have been dropped are:
+  - weather state tracking
+  - rate (velocity) handling for entities and articulations
+  - entity position request handling
+It is planned that these features will gradually be re-implemented/re-enabled, 
+but there is no timetable for that effort.
+
+Also of note is that some plugins have been renamed, split up, or removed.
+As such, remember to UPDATE YOUR CONFIG FILES!  Use the files in deffilesamples 
+as a guide.
+
+
+Version 2.0.0
+-------------
+[2008-04-01]
+
+- Implemented the new CIGI symbology interface.  The symbology management code 
+  makes use of the xlobject reference-counting and signal/slot mechanism.  
+  The new plugins are pluginSymbologyMgr and pluginRenderSymbologyCigiOSG.
+  The CIGI symbology code has support for text, circle, and line symbols.  
+  View-attached symbol surfaces are implemented, but entity-attached surfaces 
+  are not.  Most of the symbol features are implemented (nesting, flashing, 
+  color, rotation, translation, scaling, layering, creation, destruction, 
+  etc).  Features not yet implemented include line stipple/width, text fonts, 
+  and certain types of geometry (circles with holes, maybe a few others).
+
+- CMake support has been improved.  It is now the preferred system for 
+  building the MPV on Linux.  This release is likely the last to include 
+  support for autoconf/automake.  
+
+- Ported to OSG 2.2.  OSG 1.x is no longer supported.  Credit goes to 
+  J. Mauroff for the original OSG 2.2 patch.
+
+- Fixed bug 1801740 on sourceforge ("MPV shouldn't process CIGI packets 
+  in certain states").  
+
+- Cleaned up the particle system code.  The partsys.def format has changed.  
+  Particle systems should be easier to configure now.
+
+- Added more display test patterns.  Keys F9, F10 and F11 cycle through the 
+  available test patterns.
+
+- Fixed several bugs in the articulated part rendering code.  Credit goes to 
+  P. Lowman for this.
+
+- The MPV now builds on Windows again.
+
+
+Version 1.99.2 beta
+-------------------
+[2008-01-29]
+
+This release is particularly rough around the edges.  Ordinarily, more cleanup 
+would go into a release.  However, I've waited too long since the previous 
+release, and there are some big changes on the way, so a release had to be 
+made.
+
+- Support for the CMake build system has been added.  Credit goes to P. Lowman 
+  of General Dynamics Land Systems for this contribution.  Currently, the MPV 
+  contains build files for GNU autoconf/automake, Visual Studio project files, 
+  and CMake files.  It is expected that CMake will eventually become the 
+  primary (and only) build system for the MPV.
+
+- Model loading has been moved to a separate plugin.  Update your plugins.def!
+
+- Enhanced the statistics-rendering plugin.  The plugin can now display info 
+  in addition to just the framerate.  The shortcuts for this plugin are bound 
+  to the F1 through F12 keys.  F2 toggles the framerate graph.  F3 displays a 
+  summary of the entity types in the scene.  F9 displays a solid color (useful 
+  as a display pattern).  Press the F-key several times to cycle through 
+  the available options.
+
+- Many fixes have been made to the ephemeris system.  A bug in the date and 
+  time handling code has been fixed.  The technique used to render the stars 
+  has been improved.  The moon can now have a texture applied to it (oops).
+
+- Some functionality was added to the mission functions plugin, to support a 
+  specific request type.  I did not make this change; I don't know the details.
+
+- The atmospheric plugin (fog) has been enhanced to use the global weather 
+  state, as sent by the Host, when setting the fog distance.  The plugin has 
+  also been changed to take the time-of-day into account when setting the 
+  fog color.
+  
+- Fixed serious bug regarding orthographic projections.  Apparently, ortho 
+  views have been broken in the MPV for about 3 years now.
+
+- Improved handling of transparency for entities.  Formerly, the MPV would 
+  clobber any material color applied to a model; this was unavoidable, as 
+  OpenGL provides no way to change transparency without also changing material 
+  color.  The new method only changes the transparency (and material color) 
+  when an entity is not completely opaque.  This fixes the problem in the 
+  most common use-case (opaque entities).
+
+- Added a new EntityElement: TransformElement.  This allows the user to 
+  specify offsets and rotations for entity elements.  It is planned that this 
+  feature will eventually be expanded to allow the Host to control these 
+  transforms just like articulated parts.
+
+- The ViewParams struct has been renamed to View, and has been promoted to a 
+  class.
+
+- Cleaned up the terrain rendering plugin.
+
+- Merged in some bugfixes for the GDLS symbology code.
+
+- The Windows build of the MPV is broken again.
+
+
+Version 1.99.1 beta
+-------------------
+[2007-09-24]
+
+This release, like 1.99.0, contains drastic changes.  Many of the new features 
+are untested or have not been tested extensively, so this release should be 
+considered beta quality.
+
+- The MPV kernel has been re-organized, and large portions of it have been 
+  replaced.  Most significantly, the system is now controlled by a 
+  state machine.  The states correspond to the states described in the CIGI 
+  ICD.  As a result, the MPV more closely conforms to the CIGI standard.  This 
+  new state machine also makes the database-loading process more robust, and 
+  fixes a number of known bugs in the MPV.  The plugin API was modified in 
+  order to accommodate the new state machine architecture; as a result, 
+  every plugin has been modified to make use of the new API.
+
+- The blackboard interface has been changed to make use of "Chameleon objects".
+  Chameleon objects allow objects of heterogeneous type to be stored in a 
+  container, while preserving type information.  The implementation used here 
+  is from: http://www.progdoc.de/papers/chameleon/chameleon.htm
+  Note that boost::any does the same thing.
+
+- Error checking for blackboard access has been tightened.  An exception is 
+  thrown if the requested entry is not found.
+
+- A splash screen is now displayed when the MPV is in "Standby" mode.
+
+- A leak introduced in 1.99.0, related to entity construction and deletion, has 
+  been fixed.
+
+- The MPV now compiles on Windows again.
+  
+
+Version 1.99.0 beta
+-------------------
+[2007-07-31]
+
+This release contains some of the most drastic changes to the MPV in a single 
+release.  Many of the new features are untested or have not been tested 
+extensively, so this release should be considered beta quality.
+
+- Merged in new mission functions plugin, from General Dynamics Land Systems.
+  This plugin can process many more request types than the old plugin could:
+      * Line of Sight Vector Request 
+      * Line of Sight Segment Request 
+      * Line of Sight Response 
+      * HAT/HOT Request 
+      * HAT/HOT Response 
+      * HAT/HOT Extended Response 
+  This new plugin has some interesting debugging features (see 
+  missionFunctions.def) and is licensed under the more permissive LGPL (the 
+  old plugin was licensed under the GPL).
+
+- The mechanism by which entity scene graphs are constructed has been rewritten.
+  The new mechanism is much more flexible and is easier to use.  It has 
+  permitted a more CIGI-compliant implementation for handling animations.  The 
+  new mechanism has required extensive cleanup and modification to the 
+  entity rendering and management plugins, and the addition of a new helper 
+  library, commonOSG.  The most obvious user-visible difference is that the 
+  entity configuration is now performed with a single configuration file, 
+  rather than two files as it was previously.  
+  
+- The MPV is now capable of generating positional audio (3d sound).  It uses 
+  the osgAL nodekit (http://www.vrlab.umu.se/research/osgAL/).  This is perhaps 
+  the first time that CIGI has been used to generate aural cues, rather than 
+  visual cues.  Be aware that the audio plugins are currently experimental, 
+  and that compiling osgAL can be a difficult process.
+
+- The jump in version number, from 1.6.3 to 1.99.0, is to reflect that 
+  significant changes to the MPV are pending.  The next version of the 
+  MPV, 1.99.1, will feature a new plugin API that is incompatible with 
+  the original API.  Information on the roadmap toward 2.0 can be found 
+  at: http://cigi.wiki.sourceforge.net/mpv-plan
+
+- The Windows build files will not work for this release, as they have again 
+  become out-of-date.
+
+
+Version 1.6.3
+-------------
+[2007-05-03]
+
+Merged in patches from P. Lowman, which fix a number of 
+issues in the new symbology code.
+
+Merged in patch from B. Bauer, which adds streaming JPEG 
+to pluginVideoCapture.
+
+
+Version 1.6.2
+-------------
+[2007-04-05]
+
+This release includes Visual Studio build files that were 
+accidentally left out of the 1.6.1 release.
+
+This release also includes some experimental new plugins 
+from General Dynamics Land Systems for rendering symbology. 
+"Symbology" here refers to HUD graphics and the like. The 
+MPV has always had the ability to add HUD symbology to the 
+scene, but doing so required writing a new 
+application-specific plugin for each new HUD type/host 
+application. This new symbology system uses the CIGI 
+protocol itself to send the symbology control messages, and 
+presents the host with a generic, re-usable symbology 
+interface. At the moment, the best way to learn more about 
+the symbology protocol interface is to examine the code; we 
+hope to prepare a document describing the interface for the 
+next release.
+
+
+Version 1.6.1
+-------------
+[2007-02-16]
+
+- This version has working build files for Visual Studio 
+  (1.6.0beta did not).
+
+- A new plugin has been added, pluginVideoCapture, which 
+  allows the user to capture MPEG video of the MPV in 
+  action.  The MPEG feature requires the FFMPEG libraries.  
+  This plugin can take screenshots too, and the screenshot 
+  feature doesn't require FFMPEG.  See videoCapture.def to 
+  configure this plugin.
+
+- Merged in fixes from sourceforge forum for compiling with 
+  latest GCC.
+
+- Added license information for every plugin.
+
+- The license has been changed to the LGPL for several 
+  plugins.  This is the beginning of an effort to move the 
+  entire MPV (or at least as much as possible) from the GPL 
+  to the LGPL.  The plugins licensed under the LGPL are: 
+
+    * pluginMotionTrackerJoystick
+    * pluginRenderEntsLabelsOSG
+    * pluginRenderTV
+    * pluginUserInputMgrOSGGA
+    * pluginVideoCapture
+
+- The build system has been cleaned up; in addition to an 
+  number of smaller fixes, the build system now checks for 
+  OSG.
+
+- LibLTDL is no longer an external dependency; a copy of 
+  libltdl is now distributed with the MPV.
+
+
+Version 1.6.0 beta
+-------------
+[2006-12-04]
+
+This version of the MPV is of beta quality.  It has not 
+received the amount of testing that the 1.5 series has.  
+Also, it won't compile on Windows; there have been many 
+changes to the directory structure, and the Visual Studio 
+files haven't been updated.  I expect that we'll make 
+another release in two weeks, with working VS build files, 
+etc.
+
+Changes: 
+
+Merged patches from P. Lowman:
+
+  -  allow plugins to throw exceptions in the init() method
+  -  allow plugins to register user-defined packets
+  -  fixes to osgSDL for osg 1.1
+  -  take screen shots, including continuous capture (for 
+     making movies)
+
+The screen shot feature is much appreciated.  To take a 
+shot, press the 's' key.  To start continuous capturing, hit 
+shift-s.  Be prepared for the frame rate to drop 
+significantly when capturing continuously.
+
+Split up the camera plugin.  This should make the system 
+easier to maintain, and promote reuse.  
+
+Added a plugin to allow the Host to control the scale of an 
+entity via a component control.  The interface is compatible 
+with the Quantum3d CIGI extension for doing the same.
+
+Fixed bugs in the ephemeris system.
+
+Fixed bugs in the build system for pluginRenderTV.
+
+Added brief descriptions for the plugins, with info on how 
+the plugins should be ordered, to the config file.
+
+
+Version 1.5.3
+-------------
+[2006-09-26]
+
+- Fixed the timing mechanism on 64bit AMD/Intel systems.
+
+- Fixed a bug that prevented the MPV from compiling on 
+  Windows.
+
+- SDL initialization errors are now printed when they are 
+  encountered, along with an informative message which 
+  should better explain some of the more common errors.
+
+- Added a configuration flag to disable use of the joystick.
+
+- The view.def configuration file has been changed slightly. 
+  The window resolution parameters have been moved to their 
+  own section. Make sure you update your def files!
+  
+
+Version 1.5.2
+-------------
+[2006-08-24]
+
+Made changes to timer and network classes to ease 
+compilation on cygwin.  The MPV still doesn't work on 
+cygwin, but this improves the situation a little.
+
+Improved memory usage for particle systems.
+
+Merged in patch from P. Lowman which enables stereo visuals 
+(shutter glasses, red-blue, etc.)  Support for this feature 
+is dependant on your GL driver and video card.
+
+Entity labels now default to the entity type string, unless 
+the Host changes the label with a component control.
+
+Changed the frame rate graph.
+
+Added tv capture plugin.  This plugin will capture video 
+from a TV tuner card (or similar device; anything supported 
+by Video4Linux should work) and place the output in a 
+texture.  That texture is applied to a quad, which is placed 
+in the background of the scene.  Possible applications of 
+this feature include augmented reality.  This plugin was 
+implemented by D. Fries.
+
+Improved sanity checking for the view parameters.
+
+Version 1.0 of OSG will work with this release; version 1.1 will not.
+
+
+Version 1.5.1
+-------------
+[2006-06-06]
+
+Release notes for MPV-1.5.1:
+
+- The MPV now has an ephemeris system.  Ephemeris refers to 
+  the motion of celestial bodies; in short, this feature 
+  means that the MPV can now display the sun, moon and stars 
+  in the correct positions in the sky, given the time of 
+  day, time of year, and latitude and longitude of the 
+  viewer. The ephemeris plugins still need some work:
+    - the lat/lon are hard-coded, rather than retrieved from 
+      the ownship's position
+    - the time of day is retrieved from the system clock 
+      rather than the Host
+
+- Bug fixes:
+    - database switches were causing a big performance hit; 
+      tracked it down to a bug in the camera code
+    - deleting the ownship before switching would cause a 
+      crash
+    - any failure to initialize SDL would cause a crash
+
+- A new plugin has been added for putting text labels on top 
+  of entities. The label contents can be set by the Host, 
+  via a component control packet. This feature could be 
+  useful for displaying nicknames/callsigns, entity type 
+  info, debugging info, etc.
+
+- This version of the MPV should work with OSG 1.0.
+
+- Terrain now has blending enabled; databases with trees and 
+  such should now look better.
+
+- The joystick-motion-tracker plugin is now configurable for 
+  any joystick through the config files.
+
+
+Version 1.5.0 beta
+-------------
+[2006-04-27]
+
+This release of the MPV should be considered BETA quality. 
+It has not undergone the amount of testing that, for 
+example, 1.4.0 has.
+
+The highlights for this release are:
+
+Changed entity subsystem; deleted entities are moved to a 
+separate list upon deletion. This fixes the known bug where 
+an entity ID could not be re-used immediately after deleting 
+the entity associated with it.
+
+Implemented a basic weather manager. The weather data sent 
+by the Host is processed, but there is no accompanying 
+render plugin to display the weather effects.
+
+Cleaned up the coordinate conversion plugin interface.
+
+Added a plugin for faking a motion tracker by using a 
+joystick.
+
+Added a plugin for performing mission function calculations 
+(pluginMissionFuncsOSG - untested).
+
+Incorporated patches submitted by users: 
+    - static lighting plugin is now configurable via def 
+      file
+    - entities with no entry in entityVisuals.def can now 
+      have a model associated with them (feature is 
+      currently broken)
+
+Began work on an ephemeris system.
+
+
+Version 1.4.0
+-------------
+[10.11.2005]
+
+Changes/Additions: 
+------------------
+
+- Motion tracker support has been re-organized and improved.
+
+- Improvements have been made to database switching.
+
+
+Version 1.3.0
+-------------
+[08.23.2005]
+
+Changes/Additions: 
+------------------
+
+- Now works on 64-bit systems (tested on RedHat 
+  FC4 AMD64).
+
+- Ported to OSG 0.9.9.
+
+- Compiles on Windows.
+
+- MPV User's Guide updated for version 1.3.0.
+
+
+Version 1.2.0
+-------------
+[06.30.2005]
+
+Changes/Additions: 
+------------------
+
+- Bugs have been fixed.
+
+- New plugins have been added.
+
+- The process by which entities are inserted into the 
+  scene has been re-worked, to allow much more 
+  flexibility in how entities are represented.
+
+- Windows support has been improved, but the 
+  Visual Studio build files have fallen behind the 
+  Linux build files again.
+
+- This release has only been tested with OSG 0.9.8.2. 
+  OSG 0.9.9 support is forthcoming.
+
+
+Version 1.1.0
+-------------
+[02.04.2005]
+
+Changes/Additions: 
+------------------
+
+- The MPV is now stable and working on Windows. 
+   VisualStudio 7.1 is required.
+
+- The code will now compile cleanly with OSG 0.9.8.
+
+- The Linux build scripts have been improved.
+
+
+Version 1.0.0
+-------------
+[12.15.2004]
+
+- Initial Release
+
+

@@ -1,0 +1,19 @@
+MPV uses the LTDL library to load plugins.  Unfortunately, the LTDL library 
+gives horrible, misleading error messages when a plugin fails to load.
+
+This utility will load the shared library file specified on the command line 
+using the dlopen() mechanism.  Any errors will be printed to the console.
+These error messages are much more useful than those issued by LTDL.  This 
+allows you to find errors in your plugin which are otherwise difficult 
+to diagnose using the MPV.
+
+This utility uses dlopen(), so it is a Linux-specific utility.  Windows is 
+better about reporting unresolved symbols in plugins, so Windows users will 
+probably not need a utility like this anyway.
+
+Note - Don't forget to set your LD_LIBRARY_PATH to include the directories 
+where your MPV libraries are located (libmpvcommon, etc).  Also, you need 
+to give the *full* path name of the plugin library.  
+
+Example:
+./testPluginUtil /junk/mpv/mpv/pluginEntityMgr/.libs/libpluginEntityMgr.so

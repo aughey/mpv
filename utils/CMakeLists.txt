@@ -1,0 +1,5 @@
+ADD_SUBDIRECTORY(sampleHUD)
+ADD_SUBDIRECTORY(symbologyStress)
+ADD_SUBDIRECTORY(symbologyTest)
+ADD_SUBDIRECTORY(timerLogConverter)
+ADD_SUBDIRECTORY(testPlugin)

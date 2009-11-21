@@ -1,0 +1,52 @@
+#ifndef OSGSDL_TIMESOURCE_
+#define OSGSDL_TIMESOURCE_ 1
+
+#include <osg/Referenced>
+#include <osg/Timer>
+
+namespace osgSDL
+{
+
+	class TimeSource: public osg::Referenced {
+	public:
+		TimeSource() {}
+
+		virtual double getTime() = 0;
+		virtual void reset() = 0;
+
+	protected:
+		virtual ~TimeSource() {}
+		TimeSource &operator=(const TimeSource &) { return *this; }
+	};
+
+	class RealTimeSource: public TimeSource {
+	public:
+		RealTimeSource() {}
+
+		inline virtual double getTime();
+		inline void reset();
+
+	protected:
+		virtual ~RealTimeSource() {}
+		RealTimeSource &operator=(const RealTimeSource &) { return *this; }
+
+	private:
+		osg::Timer_t t0_;
+		osg::Timer tmr_;
+	};
+
+	// INLINE FUNCTIONS
+
+	inline double RealTimeSource::getTime()
+	{
+		return tmr_.delta_s(t0_, tmr_.tick());
+	}
+
+	inline void RealTimeSource::reset()
+	{
+		t0_ = tmr_.tick();
+	}
+
+}
+
+#endif

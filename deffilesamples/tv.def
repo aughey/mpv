@@ -1,0 +1,45 @@
+// This def file contains settings for the pluginRenderTV plugin.
+// pluginRenderTV will capture video from a TV tuner card (or similar 
+// device; anything supported by Video4Linux should work) and place the 
+// output in a texture.  That texture is applied to a quad, which is 
+// placed in the background of the scene.
+// 
+// To use this plugin to develop a poor-man's augmented reality system, you 
+// should disable your sky (pluginRenderSkyOSG or pluginRenderEphemerisOSG) 
+// and terrain (pluginRenderTerrainOSG) plugins.  On the Host side, you'll 
+// need some way to feed in entity telemetry and video, and keep the two 
+// synchronized.  Good luck.
+//
+render_tv
+{
+	// width and height are the resolution at which the video will be captured.
+	// OpenGL texture resolutions must be a power-of-two, but tv tuner cards 
+	// do not typically capture at vertical resolutions that are an even 
+	// power-of-two.  The textureheight option is provided in order to resolve 
+	// this.  The captured texture will be padded at the bottom so that its 
+	// resolution matches width X textureheight.  The texture coordinates for 
+	// the quad will be adjusted so that the top width X height portion of the 
+	// texture is stretched to fill the quad.  
+	// width and textureheight must be powers of 2.  height does not
+	// have that requirement, but should probably correspond to one of the 
+	// vertical resolutions that your tuner card can capture at.
+	
+	width=512;
+	height=480;
+	textureheight=512;
+	
+	// The following options allow you to "zoom in" on a specific portion 
+	// of the captured image.
+	// Out of the width and height of the captured image, specify how much
+	// the final texture is stretched to display just the StartColumn to
+	// StopColumn and StartLine to StopLine.
+	/*
+	StartColumn=46;
+	StopColumn=477;
+	StartLine=28;
+	StopLine=414;
+	*/
+	
+	// the video4linux device to capture from
+	devicefile="/dev/video0";
+}

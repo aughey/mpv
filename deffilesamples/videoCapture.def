@@ -1,0 +1,50 @@
+capture
+{
+	//
+	// Screenshot-related parameters
+	//
+	
+	// Optionally specify a location to place screenshots that are taken 
+	// (instead of directory where MPV was started) 
+	//screenshot_directory = "/usr/local/screenshots";
+	//screenshot_directory = "/tmp";
+
+	// Optionally specify a base filename for the screenshots 
+	// (mpv_screenshot is the default) 
+	screenshot_base_filename = "mpv_screenshot";
+
+	// Optionally specify an extension to be used for the screenshots jpg or mpg (jpg is 
+	// the default). 
+	filetype = "jpg";
+
+	// Optionally start recording video opon startup. The default is false.
+	//
+	capture_on_start = false;
+
+	// Optionally choose whether or not you want to write to a file (default is false).
+	//
+	write_to_file = true;
+	
+	// Optionally send the images over the network either as JPEG or MPEG.
+	// You can use VLC to view either format. JPEG is used in situations where
+	// perfomance is of premium importance. MPEG is used when bandwidth is important.
+	// NOTE: currently, you can only stream JPEG when MPV is set to 640x480 
+	//       because of socket limitations.
+	//
+	send_over_network = false;
+	dest_addr = "127.0.0.1";
+	dest_port = 8033;
+	is_broadcast = false;
+
+	//
+	// MPEG-related parameters
+	//
+
+	file_name = "mpv.mpg";
+
+	bitrate = 2000000;
+	gopsize = 1;
+
+	gray = 0;
+
+}
