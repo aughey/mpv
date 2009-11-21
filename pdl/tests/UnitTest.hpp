@@ -27,6 +27,7 @@
 
 #ifndef __PDL_UNIT_TEST_HPP__
 #define __PDL_UNIT_TEST_HPP__
+#include <stdio.h>
 
 #define UNIT_TEST( condition ) \
 if ( !( condition ) ) \

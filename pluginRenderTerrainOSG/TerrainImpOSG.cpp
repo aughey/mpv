@@ -93,9 +93,11 @@ void TerrainImpOSG::attachTerrainSubgraph( osg::Node *node )
 		attachmentPoint->addChild( terrainNode.get() );
 		// Get the pager and register the terrain node with it.
 		// This is required for the PagedLOD stuff.
+    /*
 		osgDB::DatabasePager* pager =
 			osgDB::Registry::instance()->getOrCreateDatabasePager();
 		pager->registerPagedLODs(attachmentPoint.get());
+    */
 
 		state = Terrain::Loaded;
 	}
@@ -141,7 +143,7 @@ void TerrainImpOSG::unload()
 	// never returns to its base level
 	osgDB::Registry::instance()->clearObjectCache();
 	osgDB::Registry::instance()->clearArchiveCache();
-	osgDB::Registry::instance()->getOrCreateDatabasePager()->clear();
+	//osgDB::Registry::instance()->getOrCreateDatabasePager()->clear();
 	
 	if( terrainNode.valid() )
 	{
