@@ -74,6 +74,10 @@ osg::Group * getSceneGraph(){ return viewportNode.get(); }
 	virtual void entityIDChanged( mpv::View *v );
 	virtual void viewportChanged( mpv::View *v );
 
+  osg::Node *node(void) {
+    return viewportNode.get();
+  }
+
 protected:
 	virtual ~ViewportWrapper();
 

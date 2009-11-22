@@ -17,4 +17,5 @@ MPV_PLUGIN_PROCESS_TARGET(PluginRenderCameraosgViewer)
 
 TARGET_LINK_LIBRARIES(PluginRenderCameraosgViewer
 	mpvcommon 
+  osgViewer
 	mpvcommonosg)

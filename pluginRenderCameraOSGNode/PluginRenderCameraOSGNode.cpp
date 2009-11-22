@@ -188,6 +188,7 @@ void PluginRenderCameraOSGNode::setupViewports()
 
     std::cout << "Created a viewport for view id " << view->getID() << std::endl;
 		
+    bb_->put( "OSGNode", viewportWrapper->node() );
 	}
 	
 	

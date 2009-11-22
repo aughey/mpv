@@ -131,7 +131,8 @@ void ViewportWrapper::update( const osg::Matrix &viewMatrix )
 		projectionChanged = false;
 	}
 
-  viewportNode->setMatrix(osg::Matrix::inverse(viewMatrix));
+  //viewportNode->setMatrix(osg::Matrix::inverse(viewMatrix));
+  viewportNode->setMatrix(viewMatrix);
 }
 
 
