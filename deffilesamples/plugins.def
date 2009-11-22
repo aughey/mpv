@@ -72,6 +72,9 @@ plugins
 	// renders the scene
 	//filename = "PluginRenderCameraCigiSDLOSG";
 
+  // Turns our scene into a osg::Node suitable for osgViewer
+	filename = "PluginRenderCameraOSGNode";
+
 	// takes screen shots and captures movies (very convenient)
 //	filename = "PluginVideoCapture";
 

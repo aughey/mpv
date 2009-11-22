@@ -49,20 +49,10 @@ ViewportWrapper::ViewportWrapper( View *v ) : ViewImp( v )
 {
 	projectionChanged = true;
 	
-	viewportNode = new osg::Group;
+	viewportNode = new osg::MatrixTransform;
+	projectionNode = new osg::Projection;
 
-	viewport = new osgSDL::Viewport( viewportNode.get() );
-
-	osgUtil::SceneView *sceneView = viewport->getSceneView();
-
-	sceneView->setProjectionMatrixAsPerspective(45., 1.333333333, 1., 1000. );
-
-	// a black background is needed for the star/skydome compositing, 
-	// and seems more appropriate for splash screens
-	sceneView->setClearColor( osg::Vec4( 0.0, 0.0, 0.0, 1.0 ) );
-
-	// This will turn off osg's automatic near/far plane update
-	sceneView->setComputeNearFarMode( osgUtil::CullVisitor::DO_NOT_COMPUTE_NEAR_FAR );
+  viewportNode->addChild(projectionNode.get());
 
 	// retrieve the view state and apply it
 	typeChanged( view );
@@ -99,6 +89,8 @@ ViewportWrapper::ViewportWrapper( View *v ) : ViewImp( v )
 	// arrange notification of symbol surface creation/destruction
 	view->addedSymbolSurface.connect( BIND_SLOT2( ViewportWrapper::addedSymbolSurface, this ) );
 	view->removedSymbolSurface.connect( BIND_SLOT2( ViewportWrapper::removedSymbolSurface, this ) );
+
+  std::cout << "Done creating viewport wrapper for osgNode\n";
 }
 
 
@@ -116,7 +108,7 @@ ViewportWrapper::~ViewportWrapper()
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 void ViewportWrapper::setSceneGraphRoot( osg::Group *rootNode )
 {
-	viewportNode->addChild( rootNode );
+	projectionNode->addChild( rootNode );
 }
 
 
@@ -139,8 +131,7 @@ void ViewportWrapper::update( const osg::Matrix &viewMatrix )
 		projectionChanged = false;
 	}
 
-	osgUtil::SceneView *sceneView = viewport->getSceneView();
-	sceneView->setViewMatrix( viewMatrix );
+  viewportNode->setMatrix(osg::Matrix::inverse(viewMatrix));
 }
 
 
@@ -230,11 +221,13 @@ void ViewportWrapper::entityIDChanged( View *v )
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 void ViewportWrapper::viewportChanged( View *v )
 {
-	// set up the viewport dimensions
+  // Homey don't do that here.
+  /*
 	viewport->setLeft( view->getViewportLeft() );
 	viewport->setTop( view->getViewportTop() );
 	viewport->setWidth( view->getViewportWidth() );
 	viewport->setHeight( view->getViewportHeight() );
+  */
 }
 
 
@@ -311,8 +304,6 @@ void ViewportWrapper::recalculateProjection()
 
 	double left, right, bottom, top, nearPlane, farPlane, temp;
 	
-	osgUtil::SceneView *sceneView = viewport->getSceneView();
-	
 	nearPlane = view->getNearPlane();
 	farPlane = view->getFarPlane();
 	
@@ -363,46 +354,20 @@ void ViewportWrapper::recalculateProjection()
 		ffStateAttr->setMode( osg::FrontFace::COUNTER_CLOCKWISE );
 		break;
 	}
-	
+
+  osg::Matrixd projectionmatrix;
 	if( view->getParallelProjection() )
 	{
-		sceneView->setProjectionMatrixAsOrtho( left, right, bottom, top, nearPlane, farPlane );
+    projectionmatrix.makeOrtho(left,right,bottom,top,nearPlane,farPlane);
 	}
 	else
 	{
-		sceneView->setProjectionMatrixAsFrustum( left, right, bottom, top, nearPlane, farPlane );
+    projectionmatrix.makeFrustum(left,right,bottom,top,nearPlane,farPlane);
 	}
+  std::cout << "Setting projection node matrix\n";
+  projectionNode->setMatrix(projectionmatrix);
 	
 }
 
-
-
-
-// ================================================
-// StandbyViewportWrapper
-// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-StandbyViewportWrapper::StandbyViewportWrapper( View *v ) : 
-	ViewportWrapper( v )
-{
-	osgUtil::SceneView *sceneView = viewport->getSceneView();
-	sceneView->setLightingMode( osgUtil::SceneView::NO_SCENEVIEW_LIGHT );
-}
-
-
-// ================================================
-// ~StandbyViewportWrapper
-// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-StandbyViewportWrapper::~StandbyViewportWrapper()
-{
-}
-
-// ================================================
-// setProjectionMatrix
-// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-void StandbyViewportWrapper::setProjectionMatrix( const osg::Matrix &projMatrix )
-{
-	osgUtil::SceneView *sceneView = viewport->getSceneView();
-	sceneView->setProjectionMatrix( projMatrix );
-}
 
 

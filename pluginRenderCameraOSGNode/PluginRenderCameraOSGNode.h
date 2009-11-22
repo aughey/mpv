@@ -64,14 +64,6 @@
 
 #include "ViewportWrapper.h"
 
-enum DisplaySettingOptions
-{
-	OSG_3D_EYE_SEPARATION,
-	OSG_3D_SCREEN_WIDTH,
-	OSG_3D_SCREEN_HEIGHT,
-	OSG_3D_SCREEN_DISTANCE,
-	OSG_3D_FUSION_DISTANCE,
-};
 
 //=========================================================
 //! This plugin is responsible for creating a rendering window and 
@@ -124,35 +116,7 @@ private:
 	//! complete modelview matrix.  Retrieved from the blackboard.
 	//! 
 	std::map< int, osg::Matrix > *cameraMatrixMap;
-
-	//=========================================================
-	//! A list of osgGA event handlers.  This plugin needs to add its 
-	//! event handler to this list in order to receive input events.
-	//! (Yes, I realize that this is ironic, since those very events are 
-	//! originating in this plugin... I'm just keeping things consistent.)
-	//! Retrieved from the blackboard.
-	//! 
-	std::list< osg::ref_ptr<osgGA::GUIEventHandler> > *eventHandlerList;
 	
-	//=========================================================
-	//! A list of osgGA input events.  This plugin will add the events it 
-	//! recieves from SDL to this list, so that those events can be distributed 
-	//! to other plugins.  Retrieved from the blackboard.
-	//! 
-	std::list< osg::ref_ptr<osgGA::GUIEventAdapter> > *eventList;
-	
-	//=========================================================
-	//! Boolean that indicates that the user has requested that the program 
-	//! exit.  If this is set to true, then the plugin will set stateContext's 
-	//! userRequestedQuit flag to true.
-	//! 
-	bool userRequestedQuit;
-	
-	//=========================================================
-	//! Boolean that indicates whether openWindow has been called yet.
-	//! 
-	bool haveOpenedWindow;
-
 	//=========================================================
 	//! Map containing osgSDL Viewports.  Each viewport has a FOV, a transform 
 	//! positioning its view within the scene, a position within the 2d window, 
@@ -168,22 +132,6 @@ private:
 	//! 
 	void operate();
 	
-	//=========================================================
-	//! retrieves configuration info from the config tree (width, 
-	//! height, etc)
-	//! 
-	void getConfig();
-
-	//=========================================================
-	//! Calls setupSDLViewer, setupViewports, etc.
-	//! 
-	void openWindow();
-	
-	//=========================================================
-	//! initializes SDL and creates the viewer object
-	//! 
-	void setupSDLViewer();
-
 	//=========================================================
 	//! Sets up the viewportMap, gives the viewports some default settings, etc
 	//! 

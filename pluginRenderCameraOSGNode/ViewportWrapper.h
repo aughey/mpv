@@ -35,9 +35,8 @@
 
 #include <osg/Matrix>
 #include <osg/Group>
-#include <osgUtil/SceneView>
-
-#include "osgSDL/Viewport"
+#include <osg/MatrixTransform>
+#include <osg/Projection>
 
 #include "View.h"
 
@@ -58,19 +57,11 @@ public:
 osg::Group * getSceneGraph(){ return viewportNode.get(); }
 	
 	//=========================================================
-	//! yuck... returns viewport
-	//! \return viewport
-	//!
-	osgSDL::Viewport *getViewport() { return viewport.get(); }
-	
-	//=========================================================
 	//! Calls recalculateProjection as needed, and updates the camera 
 	//! transformation matrix.
 	//! \param viewMatrix - a modelview matrix
 	//! 
 	virtual void update( const osg::Matrix &viewMatrix );
-	
-	void setEnabled( bool enabled ) { viewport->setEnabled( enabled ); }
 	
 	virtual void typeChanged( mpv::View *v );
 	virtual void parallelProjectionChanged( mpv::View *v );
@@ -94,40 +85,13 @@ protected:
 	//! 
 	void recalculateProjection();
 
-	osg::ref_ptr<osgSDL::Viewport> viewport;
-	osg::ref_ptr<osg::Group> viewportNode;
-	
+	osg::ref_ptr<osg::MatrixTransform> viewportNode;
+	osg::ref_ptr<osg::Projection> projectionNode;
+
 	//! Indicates if the projection has changed; the various signal handlers 
 	//! will set this to true if there have been any changes to the view 
 	//! frustum.
 	bool projectionChanged;
-};
-
-
-
-//=========================================================
-//! This class differs from its parent ViewportWrapper only in that it 
-//! allows a projection matrix to be specified directly.  (Ordinarily, the 
-//! projection matrix is calculated based on the View parameters.)  
-//! There are also some minor differences in how the scene lighting is 
-//! set up for this standby viewport.
-//! 
-class StandbyViewportWrapper : public ViewportWrapper
-{
-public:
-	StandbyViewportWrapper( mpv::View *v );
-
-	void setProjectionMatrix( const osg::Matrix &projMatrix );
-
-	//=========================================================
-	//! A stubbed-out replacement for ViewportWrapper::update
-	//! \param viewMatrix - a modelview matrix (unused)
-	//! 
-	virtual void update( const osg::Matrix &viewMatrix ) { }
-	
-protected:
-	virtual ~StandbyViewportWrapper();
-
 };
 
 #endif

@@ -1,26 +1,24 @@
-MPV_PLUGIN_INIT(PluginRenderCameraCigiSDLOSG)
+MPV_PLUGIN_INIT(PluginRenderCameraOSGNode)
 INCLUDE_DIRECTORIES(${OSG_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(../osgSDL/include)
 INCLUDE_DIRECTORIES(../commonOSG)
 
-SET(PluginRenderCameraCigiSDLOSG_PRIVATE_HDRS
-	PluginRenderCameraOSG.h
+SET(PluginRenderCameraOSGNode_PRIVATE_HDRS
+	PluginRenderCameraOSGNode.h
 	ViewportWrapper.h
 )
-SET(PluginRenderCameraCigiSDLOSG_SRCS
-	PluginRenderCameraOSG.cpp
+SET(PluginRenderCameraOSGNode_SRCS
+	PluginRenderCameraOSGNode.cpp
 	ViewportWrapper.cpp
 )
 
-ADD_LIBRARY(PluginRenderCameraCigiSDLOSG MODULE
-    ${PluginRenderCameraCigiSDLOSG_PUBLIC_HDRS}
-    ${PluginRenderCameraCigiSDLOSG_PRIVATE_HDRS}
-    ${PluginRenderCameraCigiSDLOSG_SRCS})
-MPV_PLUGIN_PROCESS_TARGET(PluginRenderCameraCigiSDLOSG)
+ADD_LIBRARY(PluginRenderCameraOSGNode MODULE
+    ${PluginRenderCameraOSGNode_PUBLIC_HDRS}
+    ${PluginRenderCameraOSGNode_PRIVATE_HDRS}
+    ${PluginRenderCameraOSGNode_SRCS})
+MPV_PLUGIN_PROCESS_TARGET(PluginRenderCameraOSGNode)
 
-TARGET_LINK_LIBRARIES(PluginRenderCameraCigiSDLOSG
+TARGET_LINK_LIBRARIES(PluginRenderCameraOSGNode
 	mpvcommon 
-	mpvcommonosg
-	${SDL_LIBRARY} osgSDL)
-
+	mpvcommonosg)
