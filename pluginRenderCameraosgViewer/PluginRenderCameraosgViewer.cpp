@@ -96,6 +96,7 @@ void PluginRenderCameraosgViewer::act( SystemState::ID state, StateContext &stat
         }
         viewer->setSceneData(scene);
         viewer->realize();
+        viewer->getCamera()->setComputeNearFarMode( osgUtil::CullVisitor::DO_NOT_COMPUTE_NEAR_FAR );
       }
       viewer->frame();
 
